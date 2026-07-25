@@ -9,7 +9,7 @@
  * Ticker, header, and footer come from AppShell.
  */
 import AppShell from "../layouts/AppShell.astro";
-import MediaHero from "../components/MediaHero.astro";
+import GalleryHero from "../components/GalleryHero.astro";
 import RaceCountdown from "../components/RaceCountdown.astro";
 import EditorialIntro from "../components/EditorialIntro.astro";
 import StoryScroller from "../components/StoryScroller.astro";
@@ -26,7 +26,7 @@ import { homeHero } from "../content/home.ts";
   headerVariant="overlay"
   showLoader
 >
-  <MediaHero hero={homeHero} />
+  <GalleryHero hero={homeHero} />
   <RaceCountdown />
   <EditorialIntro />
   <StoryScroller />

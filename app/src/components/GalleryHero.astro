@@ -1,0 +1,454 @@
+---
+/**
+ * GalleryHero — bento-grid opening scene with a scroll-linked reveal.
+ *
+ * Native recreation of the 21st.dev "hero-gallery-scroll-animation" pattern
+ * (agents/hero-gallery-spec.md, DEC-013). Ships zero JavaScript: the pinned
+ * sequence uses CSS scroll-driven animations and sticky positioning, gated
+ * behind @supports + prefers-reduced-motion.
+ *
+ * Layer order (base = static composition, also the reduced-motion and
+ * no-support presentation): a 100svh grid at its final layout with the copy
+ * block overlaid on a navy veil. Supporting browsers extend the section to
+ * --ghero-length, pin grid and copy, and drive the reveal from scroll.
+ *
+ * The copy block renders server-side and is fully visible at scroll 0, so
+ * the race date and Register never depend on scrolling or scripting.
+ */
+import CTAGroup from "./CTAGroup.astro";
+import type { Hero } from "../content/types.ts";
+
+interface Props {
+  hero: Hero;
+}
+
+const { hero }: Props = Astro.props;
+const gallery = hero.gallery ?? [];
+
+if (gallery.length !== 5) {
+  throw new Error(
+    `GalleryHero needs exactly 5 gallery images, got ${gallery.length}. ` +
+      "Use MediaHero for pages without a gallery.",
+  );
+}
+---
+
+<section class="ghero" aria-labelledby="hero-title" data-gallery-hero>
+  <div class="ghero__stage">
+    <div class="ghero__grid">
+      {
+        gallery.map((image, i) => (
+          <div class="ghero__cell">
+            <img
+              src={image.src}
+              alt={image.alt}
+              width={i === 0 ? 2560 : 2048}
+              height={i === 0 ? 1440 : 878}
+              fetchpriority={i === 0 ? "high" : undefined}
+              decoding="async"
+            />
+          </div>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="ghero__copy-track">
+    <div class="ghero__copy-frame">
+      <div class="ghero__veil" aria-hidden="true"></div>
+      <div class="ghero__copy container">
+        <p class="eyebrow ghero__eyebrow">{hero.eyebrow}</p>
+        <h1 class="ghero__title" id="hero-title">{hero.title}</h1>
+        <p class="ghero__subtitle measure">{hero.subtitle}</p>
+        <CTAGroup actions={hero.actions} class="ghero__actions" />
+      </div>
+    </div>
+  </div>
+</section>
+
+{/* Marks where the hero ends, so the header knows when to go solid. */}
+<div data-header-sentinel aria-hidden="true"></div>
+
+<style>
+  /* ---- Base: static composition. Serves reduced-motion users and any
+     browser without scroll-driven animation support (zero-JS fallback). --- */
+
+  .ghero {
+    --ghero-length: 220svh;
+    position: relative;
+    background-color: var(--navy-950);
+    color: var(--text-on-dark);
+    isolation: isolate;
+  }
+
+  .ghero__stage {
+    height: 100svh;
+  }
+
+  .ghero__grid {
+    display: grid;
+    height: 100svh;
+    padding: var(--space-4);
+    gap: var(--space-3);
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: 1fr 0.5fr 0.5fr 1fr;
+  }
+
+  .ghero__cell {
+    overflow: hidden;
+    border-radius: var(--radius-md, 0.75rem);
+    box-shadow: var(--shadow-md);
+  }
+
+  .ghero__cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  /* Bento placement (desktop). Cells: 1 large, 2-3 right column, 4-5 bottom. */
+  .ghero__cell:nth-child(1) {
+    grid-column: span 6;
+    grid-row: span 3;
+  }
+  .ghero__cell:nth-child(2) {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+  .ghero__cell:nth-child(3) {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+  .ghero__cell:nth-child(4) {
+    grid-column: span 3;
+  }
+  .ghero__cell:nth-child(5) {
+    grid-column: span 3;
+  }
+
+  @media (max-width: 48rem) {
+    .ghero__grid {
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: 2fr 1fr;
+    }
+
+    .ghero__cell:nth-child(1) {
+      grid-column: span 2;
+      grid-row: span 1;
+    }
+    .ghero__cell:nth-child(2),
+    .ghero__cell:nth-child(3) {
+      display: none;
+    }
+    .ghero__cell:nth-child(4),
+    .ghero__cell:nth-child(5) {
+      grid-column: span 1;
+    }
+  }
+
+  /* Copy overlays the grid in the static composition. */
+  .ghero__copy-track {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .ghero__copy-frame {
+    position: sticky;
+    inset-block-start: 0;
+    display: grid;
+    place-items: center;
+    height: 100svh;
+  }
+
+  .ghero__veil {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse 70% 60% at 50% 50%,
+      color-mix(in srgb, var(--navy-950) 88%, transparent) 0%,
+      color-mix(in srgb, var(--navy-950) 55%, transparent) 55%,
+      transparent 100%
+    );
+  }
+
+  /* Full-bleed imagery sits directly behind the copy at this size, so the
+     veil covers the whole frame rather than pooling at the centre. */
+  @media (max-width: 48rem) {
+    .ghero__veil {
+      background: color-mix(in srgb, var(--navy-950) 78%, transparent);
+    }
+  }
+
+  .ghero__copy {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    text-align: center;
+    gap: var(--space-4);
+    pointer-events: auto;
+  }
+
+  .ghero__eyebrow {
+    color: var(--yellow-500);
+  }
+
+  .ghero__title {
+    font-family: var(--font-expressive);
+    font-size: var(--text-6xl);
+    font-style: italic;
+    font-weight: var(--weight-bold);
+    line-height: 0.95;
+    letter-spacing: var(--tracking-tight);
+    color: var(--white);
+    text-wrap: balance;
+  }
+
+  .ghero__subtitle {
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--text-on-dark-muted);
+  }
+
+  .ghero__actions {
+    margin-block-start: var(--space-3);
+  }
+
+  /* ---- Enhancement: scroll-linked reveal (DEC-013). ------------------- */
+
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .ghero {
+        height: var(--ghero-length);
+        view-timeline-name: --ghero;
+        view-timeline-axis: block;
+        /*
+         * View timelines inherit the document's scroll-padding (set globally
+         * so anchor targets clear the fixed topbar). That would start the
+         * timeline one topbar-height above scroll 0 — unreachable — leaving
+         * the copy pre-faded on first paint. Measure the full scrollport
+         * instead so progress 0 lands exactly at scroll 0.
+         */
+        view-timeline-inset: 0;
+      }
+
+      .ghero__stage {
+        position: sticky;
+        inset-block-start: 0;
+        height: 100svh;
+      }
+
+      /*
+       * The grid shrinks and grows as one piece, so the opening frame reads
+       * as a deliberate miniature of the final layout rather than five
+       * scattered fragments. Cells carry a much smaller scale of their own,
+       * which widens the gaps slightly at the start and closes them as the
+       * mosaic locks together.
+       */
+      .ghero__grid {
+        animation: ghero-grid-in linear both;
+        animation-duration: auto;
+      }
+
+      .ghero__cell {
+        animation: ghero-cell-in linear both;
+        animation-duration: auto;
+      }
+
+      .ghero__copy-frame {
+        animation: ghero-copy-out linear both;
+        animation-duration: auto;
+      }
+
+      /*
+       * Timeline binding sits in its own, more specific rule on purpose.
+       * CSS minifiers fold `animation-timeline` into the `animation`
+       * shorthand, and Chrome rejects a shorthand carrying a timeline name —
+       * which silently disables the animation entirely. Separate selectors
+       * cannot be folded together, so the binding survives minification.
+       */
+      .ghero .ghero__grid,
+      .ghero .ghero__cell {
+        animation-timeline: --ghero;
+        animation-range: contain 0% contain 90%;
+      }
+
+      .ghero .ghero__copy-frame {
+        animation-timeline: --ghero;
+        animation-range: contain 0% contain 50%;
+      }
+
+      /* The veil fades with the copy frame; once faded the copy is inert
+         (pointer-events none on the track keeps the grid clickable). */
+
+      /*
+       * Narrow screens keep the mosaic full-bleed and animate only the copy.
+       * A two-column grid shrunk to 62% collapses into thin strips that the
+       * headline then has to fight; full-bleed images under a fading veil
+       * read far better at this size.
+       */
+      @media (max-width: 48rem) {
+        .ghero__grid,
+        .ghero__cell {
+          animation: none;
+        }
+      }
+    }
+  }
+
+  /* ---- Scripted parity path (DEC-013, 2026-07-25). ------------------- */
+
+  /*
+   * Browsers without scroll-driven animations (Firefox today) get the same
+   * reveal from a small script that publishes progress as custom properties.
+   * The script attaches only when the native path is unavailable and motion
+   * is welcome, so Chromium keeps its zero-JS route and reduced-motion users
+   * keep the static composition. Values below mirror the keyframes exactly.
+   */
+  .ghero.is-js-driven {
+    height: var(--ghero-length);
+  }
+
+  .ghero.is-js-driven .ghero__stage {
+    position: sticky;
+    inset-block-start: 0;
+    height: 100svh;
+  }
+
+  .ghero.is-js-driven .ghero__grid {
+    scale: var(--ghero-grid-scale, 1);
+  }
+
+  .ghero.is-js-driven .ghero__cell {
+    scale: var(--ghero-cell-scale, 1);
+  }
+
+  .ghero.is-js-driven .ghero__copy-frame {
+    opacity: var(--ghero-copy-opacity, 1);
+    scale: var(--ghero-copy-scale, 1);
+  }
+
+  .ghero.is-js-driven.is-copy-out .ghero__copy-frame {
+    visibility: hidden;
+  }
+
+  /* Narrow screens animate the copy only, as in the native path. */
+  @media (max-width: 48rem) {
+    .ghero.is-js-driven .ghero__grid,
+    .ghero.is-js-driven .ghero__cell {
+      scale: none;
+    }
+  }
+
+  @keyframes ghero-grid-in {
+    from {
+      scale: 0.62;
+    }
+    to {
+      scale: 1;
+    }
+  }
+
+  @keyframes ghero-cell-in {
+    from {
+      scale: 0.9;
+    }
+    to {
+      scale: 1;
+    }
+  }
+
+  @keyframes ghero-copy-out {
+    from {
+      opacity: 1;
+      scale: 1;
+    }
+    to {
+      opacity: 0;
+      scale: 0.6;
+      /* Discrete flip at the end: once faded, the copy (and its CTAs) stops
+         intercepting pointer input over the grid. */
+      visibility: hidden;
+    }
+  }
+
+  @media (max-width: 48rem) {
+    .ghero {
+      --ghero-length: 180svh;
+    }
+  }
+</style>
+
+<script>
+  /*
+   * Parity driver for browsers without CSS scroll-driven animations.
+   *
+   * Chromium resolves the reveal natively and this script exits immediately,
+   * so the fast path stays script-free. Everywhere else it publishes scroll
+   * progress as custom properties that the .is-js-driven rules consume —
+   * same numbers as the keyframes, so the two paths cannot drift.
+   */
+  const hero = document.querySelector<HTMLElement>("[data-gallery-hero]");
+
+  if (hero) {
+    const supportsNative =
+      CSS.supports("animation-timeline", "--ghero") &&
+      CSS.supports("view-timeline-name", "--ghero");
+
+    if (!supportsNative) {
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const PROPS = [
+        "--ghero-grid-scale",
+        "--ghero-cell-scale",
+        "--ghero-copy-opacity",
+        "--ghero-copy-scale",
+      ];
+
+      const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
+      let frame = 0;
+
+      const update = () => {
+        frame = 0;
+        const rect = hero.getBoundingClientRect();
+        const pinned = rect.height - window.innerHeight;
+        // rect.top is 0 at the start of the pin and -pinned at its end.
+        const progress = pinned > 0 ? clamp01(-rect.top / pinned) : 0;
+
+        // Grid and cells finish at 90% of the pin; the copy clears by 50%.
+        const grow = clamp01(progress / 0.9);
+        const fade = clamp01(progress / 0.5);
+
+        hero.style.setProperty("--ghero-grid-scale", `${0.62 + 0.38 * grow}`);
+        hero.style.setProperty("--ghero-cell-scale", `${0.9 + 0.1 * grow}`);
+        hero.style.setProperty("--ghero-copy-opacity", `${1 - fade}`);
+        hero.style.setProperty("--ghero-copy-scale", `${1 - 0.4 * fade}`);
+        hero.classList.toggle("is-copy-out", fade >= 1);
+      };
+
+      const request = () => {
+        if (!frame) frame = requestAnimationFrame(update);
+      };
+
+      const attach = () => {
+        hero.classList.add("is-js-driven");
+        update();
+        window.addEventListener("scroll", request, { passive: true });
+        window.addEventListener("resize", request);
+      };
+
+      const detach = () => {
+        window.removeEventListener("scroll", request);
+        window.removeEventListener("resize", request);
+        hero.classList.remove("is-js-driven", "is-copy-out");
+        PROPS.forEach((prop) => hero.style.removeProperty(prop));
+      };
+
+      // Reduced motion keeps the static composition, and honours a change of
+      // preference without a reload.
+      const sync = () => (reduced.matches ? detach() : attach());
+      sync();
+      reduced.addEventListener("change", sync);
+    }
+  }
+</script>

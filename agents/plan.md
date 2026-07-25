@@ -305,6 +305,7 @@ If video is unavailable, build a cinematic photo hero with subtle scale, crossfa
 ### Work
 
 - Convert the legacy content into structured page data.
+- Use `content-tree.md` as the starting sitemap and migration checklist.
 - Remove outdated years, broken links, duplicate copy, and obsolete partners.
 - Shorten homepage content into clear visual scenes.
 - Preserve detailed logistics on internal pages.

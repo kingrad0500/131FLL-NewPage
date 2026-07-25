@@ -1,0 +1,17 @@
+---
+import AppShell from "../../layouts/AppShell.astro";
+import RaceDetail from "../../components/RaceDetail.astro";
+import { tenKPage } from "../../content/races.ts";
+---
+
+<AppShell
+  title="10K — Fort Lauderdale 13.1"
+  description="The Fort Lauderdale 13.1 10K: a 7:00 AM start at Las Olas and A1A, oceanfront miles, and the same beachfront finish."
+  headerVariant="overlay"
+>
+  <RaceDetail
+    page={tenKPage}
+    registerCopy="Entries are handled on RunSignup."
+    showArtwork={false}
+  />
+</AppShell>

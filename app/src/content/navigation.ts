@@ -17,6 +17,9 @@ export const navigation: NavGroup[] = [
       { label: "Relay", href: "/race/relay", inRelease: true },
       { label: "10K", href: "/race/10k", inRelease: true },
       { label: "5K", href: "/race/5k", inRelease: true },
+      // Informational: entry itself happens on RunSignup, but the eligibility
+      // and refund policies need a home on the event's own site (DEC-001).
+      { label: "Registration", href: "/registration", inRelease: true },
     ],
   },
   {

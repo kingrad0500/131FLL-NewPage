@@ -1,0 +1,168 @@
+---
+/**
+ * FaqAccordion — grouped questions as native disclosure widgets.
+ *
+ * Built on <details>/<summary>, so it works with zero JavaScript: keyboard
+ * operable, screen-reader announced, and open/closed state handled by the
+ * browser. Ctrl+F still finds closed answers in browsers that support
+ * hidden-until-found.
+ *
+ * The open/close animation uses ::details-content with interpolate-size.
+ * Where that is unsupported the panel simply snaps open — the interaction is
+ * identical, only the easing is missing.
+ */
+import Provisional from "./Provisional.astro";
+import { isTBD } from "../lib/placeholder.ts";
+import type { FaqGroup } from "../content/types.ts";
+
+interface Props {
+  groups: FaqGroup[];
+}
+
+const { groups }: Props = Astro.props;
+---
+
+<div class="faq">
+  {
+    groups.map((group) => (
+      <section class="faq__group" aria-labelledby={`${group.id}-title`}>
+        <h2 class="faq__group-title" id={`${group.id}-title`}>
+          {group.title}
+        </h2>
+
+        <div class="faq__items">
+          {group.items.map((item) => (
+            <details class="qa" name={group.id}>
+              <summary class="qa__question">
+                <span class="qa__text">{item.question}</span>
+                <span class="qa__icon" aria-hidden="true" />
+              </summary>
+              <div class="qa__answer">
+                {isTBD(item.answer) ? (
+                  <p>
+                    <Provisional value={item.answer} />
+                  </p>
+                ) : (
+                  <p class="measure">{item.answer}</p>
+                )}
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
+    ))
+  }
+</div>
+
+<style>
+  .faq {
+    display: grid;
+    gap: var(--space-9);
+    margin-block-start: var(--space-7);
+  }
+
+  .faq__group-title {
+    font-size: var(--text-2xl);
+    padding-block-end: var(--space-3);
+    border-block-end: var(--border-width-thick) solid var(--accent-sun-on-light);
+  }
+
+  .faq__items {
+    display: grid;
+  }
+
+  .qa {
+    border-block-end: var(--border-width) solid var(--border-subtle);
+  }
+
+  .qa__question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+    padding-block: var(--space-4);
+    min-height: var(--touch-target);
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-snug);
+    cursor: pointer;
+    list-style: none;
+    transition: color var(--duration-micro) var(--ease-standard);
+  }
+
+  /* Safari still paints the default marker without this. */
+  .qa__question::-webkit-details-marker {
+    display: none;
+  }
+
+  .qa__question:hover {
+    color: var(--accent-coastal-on-light);
+  }
+
+  .qa__icon {
+    position: relative;
+    flex: none;
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+  }
+
+  /* A plus that becomes a minus — cheaper than an icon file and it animates. */
+  .qa__icon::before,
+  .qa__icon::after {
+    content: "";
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 0;
+    inline-size: 100%;
+    block-size: 2px;
+    background-color: var(--accent-coastal-on-light);
+    translate: 0 -50%;
+    transition: rotate var(--duration-micro) var(--ease-standard);
+  }
+
+  .qa__icon::after {
+    rotate: 90deg;
+  }
+
+  .qa[open] .qa__icon::after {
+    rotate: 0deg;
+  }
+
+  .qa__answer {
+    padding-block-end: var(--space-5);
+    color: var(--text-secondary);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+  }
+
+  /* Animated disclosure where the browser supports it. */
+  @supports (interpolate-size: allow-keywords) {
+    .qa {
+      interpolate-size: allow-keywords;
+    }
+
+    .qa::details-content {
+      block-size: 0;
+      overflow: hidden;
+      transition:
+        block-size var(--duration-micro) var(--ease-standard),
+        content-visibility var(--duration-micro) allow-discrete;
+    }
+
+    .qa[open]::details-content {
+      block-size: auto;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .qa::details-content {
+      transition: none;
+    }
+
+    .qa__icon::before,
+    .qa__icon::after {
+      transition: none;
+    }
+  }
+</style>

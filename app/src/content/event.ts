@@ -26,7 +26,7 @@ export const event: EventFacts = {
   resultsUrl: "https://runsignup.com/Race/Results/Overview/83064",
   photosUrl: "https://runsignup.com/Race/FortLauderdale131/Page-2",
 
-  contactEmail: "Josh@splitsecondtiming.com",
+  contactEmail: "info@131FortLauderdale.com",
   volunteerEmail: "Lorraine@exclusivesports.com",
 
   social: [

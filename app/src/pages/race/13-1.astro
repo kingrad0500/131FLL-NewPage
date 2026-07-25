@@ -1,0 +1,16 @@
+---
+import AppShell from "../../layouts/AppShell.astro";
+import RaceDetail from "../../components/RaceDetail.astro";
+import { halfMarathonPage } from "../../content/races.ts";
+---
+
+<AppShell
+  title="Half Marathon — Fort Lauderdale 13.1"
+  description="The Fort Lauderdale 13.1 half marathon: a 6:15 AM start at Las Olas and A1A, a USATF-certified oceanfront course, and a finish line on the beach."
+  headerVariant="overlay"
+>
+  <RaceDetail
+    page={halfMarathonPage}
+    registerCopy="Entries are handled on RunSignup. The half marathon is capped, so it closes when it fills."
+  />
+</AppShell>

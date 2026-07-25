@@ -2,11 +2,22 @@
 /**
  * StoryScroller — the "Sunrise to Finish Line" feature sequence.
  *
- * Phase 6 builds this as a plain stack (plan.md, step 9). The sticky desktop
- * media panel is a Phase 9 enhancement layered on top of this markup, which is
- * also the permanent mobile and reduced-motion presentation. Building the
- * stack first guarantees the enhancement has a working baseline to fall back
- * to rather than a broken one.
+ * The plain alternating stack below is the baseline: it is what mobile,
+ * reduced-motion, and no-JavaScript visitors get, and it is fully readable on
+ * its own. The Phase 9 enhancement (plan.md, step 9) layers a sticky desktop
+ * media panel on top of that markup — one image held in view while the steps
+ * scroll past it, cross-fading as each step reaches the middle of the screen.
+ *
+ * Pattern adapted from the 21st.dev "scroll-01" component (DEC-013: inspiration
+ * only, rebuilt with project tokens). Two deliberate departures from it:
+ *
+ *   · Inactive steps dim rather than fade to nothing. The original leaves only
+ *     one paragraph readable at a time, which is hostile to anyone scanning
+ *     the page for information.
+ *   · Activation is driven by IntersectionObserver, not scroll-driven CSS.
+ *     "Which step is centred" is a discrete question, and IO is supported
+ *     everywhere — including Firefox, which ships no scroll-driven animation
+ *     support at all (see agents/hero-gallery-spec.md).
  */
 import PlaceholderMedia from "./PlaceholderMedia.astro";
 import { stories } from "../content/stories.ts";
@@ -29,50 +40,88 @@ const {
 }: Props = Astro.props;
 
 const titleId = `${id}-title`;
+
+/*
+ * The sticky panel needs an image for every step. A step still waiting on
+ * media renders a placeholder in the stack, and the sequence falls back to
+ * that stack rather than showing a panel with holes in it.
+ */
+const canStick = steps.length > 0 && steps.every((story) => story.media);
 ---
 
 <section
   class:list={["stories", "section", `section--${surface}`]}
   aria-labelledby={titleId}
+  data-story-scroller
 >
   <div class="container">
     <p class="eyebrow">{eyebrow}</p>
     <h2 class="section__title stories__title" id={titleId}>{title}</h2>
 
-    <ol class="stories__list" role="list">
+    <div class="stories__layout">
       {
-        steps.map((story, index) => (
-          <li class="story" data-accent={story.accent}>
-            <div class="story__media">
-              {story.media ? (
+        /*
+         * Sticky media panel. The images repeat the ones inside each step
+         * because the stack needs its own inline media to stay readable
+         * without JavaScript. The URLs are identical, so the browser fetches
+         * each file once either way. Hidden from assistive technology until
+         * the script takes over, which then exposes only the active image.
+         */
+        canStick && (
+          <div class="stories__panel" data-story-panel aria-hidden="true">
+            <div class="stories__panel-frame">
+              {steps.map((story) => (
                 <img
-                  src={story.media}
+                  class="stories__panel-image"
+                  src={story.media!}
                   alt={story.mediaAlt}
-                  width="960"
-                  height="640"
+                  width="1600"
+                  height="1067"
                   loading="lazy"
                   decoding="async"
+                  aria-hidden="true"
                 />
-              ) : (
-                <PlaceholderMedia
-                  label={`Story image — ${story.title}`}
-                  intendedAlt={story.mediaAlt}
-                  ratio="3 / 2"
-                />
-              )}
+              ))}
             </div>
-
-            <div class="story__text">
-              <span class="story__index" aria-hidden="true">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <h3 class="story__heading">{story.title}</h3>
-              <p class="measure">{story.body}</p>
-            </div>
-          </li>
-        ))
+          </div>
+        )
       }
-    </ol>
+
+      <ol class="stories__list" role="list">
+        {
+          steps.map((story, index) => (
+            <li class="story" data-accent={story.accent} data-story-step={index}>
+              <div class="story__media">
+                {story.media ? (
+                  <img
+                    src={story.media}
+                    alt={story.mediaAlt}
+                    width="960"
+                    height="640"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : (
+                  <PlaceholderMedia
+                    label={`Story image — ${story.title}`}
+                    intendedAlt={story.mediaAlt}
+                    ratio="3 / 2"
+                  />
+                )}
+              </div>
+
+              <div class="story__text">
+                <span class="story__index" aria-hidden="true">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <h3 class="story__heading">{story.title}</h3>
+                <p class="measure">{story.body}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
   </div>
 </section>
 
@@ -138,6 +187,12 @@ const titleId = `${id}-title`;
     border-radius: var(--radius-md);
   }
 
+  /* The panel only exists once the script switches the section into sticky
+     mode, so the baseline stack is never affected by it. */
+  .stories__panel {
+    display: none;
+  }
+
   @media (max-width: 52rem) {
     .story {
       grid-template-columns: 1fr;
@@ -152,4 +207,199 @@ const titleId = `${id}-title`;
       gap: var(--space-9);
     }
   }
+
+  /* ---- Sticky sequence (desktop, script-enabled, motion welcome) ------ */
+
+  /* The list's own block padding already separates the sequence from the
+     heading; the heading margin on top of it just widens the gap. */
+  .stories.is-sticky .stories__title {
+    margin-block-end: 0;
+  }
+
+  .stories.is-sticky .stories__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-8);
+    align-items: start;
+  }
+
+  /*
+   * The panel is a full viewport tall and centres the image inside it, so the
+   * picture always sits on the vertical centre line — the same line the
+   * observer uses to decide which step is active. The step list is padded to
+   * put its first and last steps on that line too, which keeps image and text
+   * level all the way through, including before the panel sticks and after it
+   * releases.
+   */
+  .stories.is-sticky .stories__panel {
+    display: grid;
+    place-items: center;
+    position: sticky;
+    inset-block-start: 0;
+    block-size: 100svh;
+  }
+
+  .stories__panel-frame {
+    position: relative;
+    inline-size: 100%;
+    aspect-ratio: 3 / 2;
+    max-block-size: 70svh;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background-color: var(--navy-950);
+  }
+
+  .stories__panel-image {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity var(--duration-crossfade) var(--ease-standard);
+  }
+
+  .stories__panel-image.is-active {
+    opacity: 1;
+  }
+
+  /* Media now lives in the panel; the inline copy would only repeat it. */
+  .stories.is-sticky .story__media {
+    display: none;
+  }
+
+  /*
+   * The block padding lands the first and last steps on the viewport centre
+   * line, matching the panel. The gap is then tuned so the whole sequence
+   * still runs about three screens — any longer and the distances and
+   * registration sit too far below the fold.
+   */
+  .stories.is-sticky .stories__list {
+    gap: var(--story-step-gap, 40svh);
+    padding-block: 43svh 43svh;
+  }
+
+  .stories.is-sticky .story {
+    grid-template-columns: 1fr;
+    /* Inactive steps dim but stay legible — nothing is ever unreadable. */
+    opacity: 0.45;
+    transition: opacity var(--duration-micro) var(--ease-standard);
+  }
+
+  .stories.is-sticky .story.is-active {
+    opacity: 1;
+  }
+
+  /* Safety net: the script already withholds sticky mode from these users,
+     but a preference flipped mid-session must never leave motion running. */
+  @media (prefers-reduced-motion: reduce) {
+    .stories__panel-image,
+    .stories.is-sticky .story {
+      transition: none;
+    }
+  }
 </style>
+
+<script>
+  /*
+   * Sticky-sequence controller.
+   *
+   * Adds the sticky presentation on top of the readable stack when the screen
+   * is wide enough and motion is welcome; removes it cleanly otherwise, so a
+   * change of preference or a window resize never strands the section in a
+   * half-applied state.
+   */
+  const section = document.querySelector<HTMLElement>("[data-story-scroller]");
+  const panel = section?.querySelector<HTMLElement>("[data-story-panel]");
+
+  if (section && panel) {
+    const steps = Array.from(
+      section.querySelectorAll<HTMLElement>("[data-story-step]"),
+    );
+    const images = Array.from(
+      panel.querySelectorAll<HTMLImageElement>(".stories__panel-image"),
+    );
+
+    if (steps.length > 0 && steps.length === images.length) {
+      const wideEnough = window.matchMedia("(min-width: 52rem)");
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+      let observer: IntersectionObserver | null = null;
+      let active = -1;
+
+      const setActive = (index: number) => {
+        if (index === active) return;
+        active = index;
+
+        steps.forEach((step, i) => step.classList.toggle("is-active", i === index));
+        images.forEach((image, i) => {
+          const isActive = i === index;
+          image.classList.toggle("is-active", isActive);
+          // Only the image actually on screen is exposed to assistive tech;
+          // announcing five at once would just repeat the step headings.
+          if (isActive) image.removeAttribute("aria-hidden");
+          else image.setAttribute("aria-hidden", "true");
+        });
+      };
+
+      /*
+       * A narrow band across the middle of the viewport decides the active
+       * step. Steps sit far enough apart that the band is often empty — the
+       * last step to cross it stays active, which is exactly the behaviour
+       * wanted: the image holds until the next step arrives.
+       */
+      const onIntersect: IntersectionObserverCallback = (entries) => {
+        const middle = window.innerHeight / 2;
+        let nearest = -1;
+        let shortest = Infinity;
+
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const box = entry.boundingClientRect;
+          const distance = Math.abs(box.top + box.height / 2 - middle);
+          if (distance < shortest) {
+            shortest = distance;
+            nearest = steps.indexOf(entry.target as HTMLElement);
+          }
+        }
+
+        if (nearest !== -1) setActive(nearest);
+      };
+
+      const enable = () => {
+        if (observer) return;
+        section.classList.add("is-sticky");
+        panel.removeAttribute("aria-hidden");
+
+        observer = new IntersectionObserver(onIntersect, {
+          rootMargin: "-45% 0px -45% 0px",
+        });
+        steps.forEach((step) => observer!.observe(step));
+
+        // The first step leads until the sequence is scrolled into.
+        active = -1;
+        setActive(0);
+      };
+
+      const disable = () => {
+        observer?.disconnect();
+        observer = null;
+        section.classList.remove("is-sticky");
+        panel.setAttribute("aria-hidden", "true");
+        steps.forEach((step) => step.classList.remove("is-active"));
+        images.forEach((image) => {
+          image.classList.remove("is-active");
+          image.setAttribute("aria-hidden", "true");
+        });
+        active = -1;
+      };
+
+      const sync = () =>
+        wideEnough.matches && !reduced.matches ? enable() : disable();
+
+      sync();
+      wideEnough.addEventListener("change", sync);
+      reduced.addEventListener("change", sync);
+    }
+  }
+</script>

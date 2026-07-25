@@ -1,0 +1,306 @@
+---
+/**
+ * RaceDetail — the shared body of every distance page.
+ *
+ * Section order mirrors how a runner reads a race page: what it is, the hard
+ * facts, the course, what entry includes, the policies, then the action.
+ * Approved on /race/13-1 (2026-07-25) and applied unchanged to the rest, so a
+ * new distance is a data file rather than a new layout.
+ */
+import InteriorHero from "./InteriorHero.astro";
+import CTAGroup from "./CTAGroup.astro";
+import Provisional from "./Provisional.astro";
+import PlaceholderMedia from "./PlaceholderMedia.astro";
+import { registerAction } from "../content/event.ts";
+import { isTBD } from "../lib/placeholder.ts";
+import type { RacePage } from "../content/types.ts";
+
+interface Props {
+  page: RacePage;
+  /** Closing line above the register buttons. */
+  registerCopy: string;
+  /** Shown beside "what you receive"; omitted when there is no artwork yet. */
+  showArtwork?: boolean;
+}
+
+const { page, registerCopy, showArtwork = true }: Props = Astro.props;
+---
+
+<InteriorHero
+  eyebrow={page.eyebrow}
+  title={page.title}
+  subtitle={page.subtitle}
+  image={page.heroImage}
+  focalPoint="50% 45%"
+/>
+
+<section class="section section--light" aria-labelledby="about-title">
+  <div class="container race__intro">
+    <div>
+      <p class="eyebrow">The Race</p>
+      <h2 class="section__title" id="about-title">{page.title}</h2>
+      {page.intro.map((paragraph) => <p class="measure race__lede">{paragraph}</p>)}
+    </div>
+
+    <dl class="facts">
+      {
+        page.facts.map((fact) => (
+          <div class="facts__row">
+            <dt class="facts__label">{fact.label}</dt>
+            <dd class="facts__value">
+              <Provisional value={fact.value} />
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>
+
+{
+  page.courseMap && (
+    <section class="section section--warm" aria-labelledby="course-title">
+      <div class="container">
+        <p class="eyebrow">The Course</p>
+        <h2 class="section__title" id="course-title">Course map</h2>
+
+        <figure class="coursemap">
+          <img
+            class="coursemap__image"
+            src={page.courseMap.src}
+            alt={page.courseMap.alt}
+            width="1200"
+            height="2513"
+            loading="lazy"
+            decoding="async"
+          />
+          <figcaption class="coursemap__caption measure">
+            {page.courseMap.caption}{" "}
+            <a
+              class="coursemap__expand"
+              href="/assets/maps/course-map-large.avif"
+              target="_blank"
+              rel="noopener"
+            >
+              Open the full-size map
+              <span class="visually-hidden"> (opens in a new tab)</span>
+            </a>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+  )
+}
+
+<section class="section section--light" aria-labelledby="receive-title">
+  <div class:list={["container", showArtwork && "race__receive"]}>
+    <div>
+      <p class="eyebrow">Register and Receive</p>
+      <h2 class="section__title" id="receive-title">What your entry includes</h2>
+      <ul class="receive" role="list">
+        {
+          page.receive.map((item) => (
+            <li class="receive__item">
+              <Provisional value={item} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    {
+      showArtwork && (
+        <div class="artwork">
+          <PlaceholderMedia
+            label="2026 race shirt artwork"
+            intendedAlt="Artwork for the 2026 Fort Lauderdale 13.1 race shirt"
+            ratio="1 / 1"
+          />
+          <PlaceholderMedia
+            label="2026 finisher medal artwork"
+            intendedAlt="Artwork for the 2026 Fort Lauderdale 13.1 finisher medal"
+            ratio="1 / 1"
+          />
+        </div>
+      )
+    }
+  </div>
+</section>
+
+{
+  page.notes.length > 0 && (
+    <section class="section section--muted" aria-labelledby="notes-title">
+      <div class="container">
+        <p class="eyebrow">Good to Know</p>
+        <h2 class="section__title" id="notes-title">Before you line up</h2>
+
+        <div class="notes">
+          {page.notes.map((note) => (
+            <article class="note">
+              <h3 class="note__title">{note.title}</h3>
+              {isTBD(note.body) ? (
+                <p>
+                  <Provisional value={note.body} />
+                </p>
+              ) : (
+                <p class="measure note__body">{note.body}</p>
+              )}
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<section class="section section--dark" aria-labelledby="register-title">
+  <div class="container race__register">
+    <h2 class="section__title" id="register-title">Ready to run it?</h2>
+    <p class="measure race__register-copy">{registerCopy}</p>
+    <CTAGroup
+      actions={[
+        registerAction,
+        { label: "Race Schedule", href: "/race/schedule", priority: "secondary" },
+      ]}
+    />
+  </div>
+</section>
+
+<style>
+  .race__intro,
+  .race__receive {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: var(--space-9) var(--space-8);
+    align-items: start;
+  }
+
+  .race__lede + .race__lede {
+    margin-block-start: var(--space-4);
+  }
+
+  .facts {
+    display: grid;
+    gap: 0;
+    border-block-start: var(--border-width) solid var(--border-subtle);
+  }
+
+  .facts__row {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: var(--space-4);
+    padding-block: var(--space-4);
+    border-block-end: var(--border-width) solid var(--border-subtle);
+  }
+
+  .facts__label {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  .facts__value {
+    font-size: var(--text-base);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-snug);
+  }
+
+  .coursemap {
+    margin-block-start: var(--space-7);
+    display: grid;
+    justify-items: center;
+    gap: var(--space-4);
+  }
+
+  .coursemap__image {
+    /*
+     * The map carries mile markers and station labels. Height must not be
+     * capped to the viewport — that squeezed it to ~350px wide and made every
+     * label unreadable. It runs at a legible width and the page scrolls, with
+     * the full-resolution file a click away.
+     */
+    inline-size: min(100%, 40rem);
+    block-size: auto;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+  }
+
+  .coursemap__caption {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    text-align: center;
+  }
+
+  .coursemap__expand {
+    white-space: nowrap;
+    font-weight: var(--weight-bold);
+  }
+
+  .receive {
+    display: grid;
+    gap: var(--space-3);
+    margin-block-start: var(--space-6);
+  }
+
+  .receive__item {
+    position: relative;
+    padding-inline-start: var(--space-6);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+  }
+
+  .receive__item::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-start: 0.55em;
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+    border-radius: 50%;
+    background-color: var(--accent-sun-on-light);
+  }
+
+  .artwork {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-5);
+  }
+
+  .notes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: var(--space-7) var(--space-8);
+    margin-block-start: var(--space-7);
+  }
+
+  .note__title {
+    font-size: var(--text-lg);
+    margin-block-end: var(--space-2);
+  }
+
+  .note__body {
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    color: var(--text-secondary);
+  }
+
+  .race__register {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-4);
+  }
+
+  .race__register-copy {
+    color: var(--text-on-dark-muted);
+  }
+
+  @media (max-width: 52rem) {
+    .race__intro,
+    .race__receive {
+      grid-template-columns: 1fr;
+      gap: var(--space-7);
+    }
+  }
+</style>

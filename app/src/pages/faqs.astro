@@ -1,0 +1,114 @@
+---
+/**
+ * FAQs & Contact.
+ */
+import AppShell from "../layouts/AppShell.astro";
+import InteriorHero from "../components/InteriorHero.astro";
+import FaqAccordion from "../components/FaqAccordion.astro";
+import Provisional from "../components/Provisional.astro";
+import { GENERATED } from "../lib/placeholder.ts";
+import { event } from "../content/event.ts";
+import { faqGroups } from "../content/faqs.ts";
+
+const heroImage = GENERATED(
+  "/assets/heroes/interior-faqs.avif",
+  "Interior hero — FAQs and contact",
+);
+---
+
+<AppShell
+  title="FAQs & Contact — Fort Lauderdale 13.1"
+  description="Answers about the Fort Lauderdale 13.1: start times, the course, packet pickup, registration policies, results, and how to reach us."
+  headerVariant="overlay"
+>
+  <InteriorHero
+    eyebrow="Questions"
+    title="FAQs"
+    subtitle="Answers to what runners ask us most."
+    image={heroImage}
+  />
+
+  <section class="section section--light" aria-labelledby="faq-title">
+    <div class="container">
+      <p class="eyebrow">Everything Else</p>
+      <h2 class="section__title visually-hidden" id="faq-title">
+        Frequently asked questions
+      </h2>
+      <FaqAccordion groups={faqGroups} />
+    </div>
+  </section>
+
+  <section class="section section--dark" aria-labelledby="contact-title">
+    <div class="container contact">
+      <div>
+        <p class="eyebrow">Still Stuck?</p>
+        <h2 class="section__title" id="contact-title">Get in touch</h2>
+        <p class="measure contact__body">
+          If your question is not answered above, email us — we would rather
+          hear from you before race morning than after.
+        </p>
+      </div>
+
+      <dl class="contact__list">
+        <div>
+          <dt>General enquiries</dt>
+          <dd>
+            <Provisional value={event.contactEmail}>
+              <a href={`mailto:${event.contactEmail}`}>{event.contactEmail}</a>
+            </Provisional>
+          </dd>
+        </div>
+        <div>
+          <dt>Volunteering</dt>
+          <dd>
+            <Provisional value={event.volunteerEmail}>
+              <a href={`mailto:${event.volunteerEmail}`}>{event.volunteerEmail}</a>
+            </Provisional>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+</AppShell>
+
+<style>
+  .contact {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    gap: var(--space-8);
+    align-items: start;
+  }
+
+  .contact__body {
+    margin-block-start: var(--space-4);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    color: var(--text-on-dark-muted);
+  }
+
+  .contact__list {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .contact__list dt {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+    color: var(--yellow-500);
+    margin-block-end: var(--space-2);
+  }
+
+  .contact__list dd {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-medium);
+  }
+
+  @media (max-width: 52rem) {
+    .contact {
+      grid-template-columns: 1fr;
+      gap: var(--space-7);
+    }
+  }
+</style>

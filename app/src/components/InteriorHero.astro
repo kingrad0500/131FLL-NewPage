@@ -1,0 +1,118 @@
+---
+/**
+ * InteriorHero — the standard opening band for every interior route.
+ *
+ * Shorter than the homepage hero (45–65svh) so the page's first real content
+ * is visible without scrolling, and deliberately static: the homepage owns the
+ * one cinematic moment, and repeating it on nine routes would cheapen it.
+ *
+ * The image is decorative here — the title beside it names the page — so it
+ * carries an empty alt and the heading does the work for assistive tech.
+ */
+import type { Hero } from "../content/types.ts";
+
+interface Props {
+  eyebrow?: string;
+  title: string;
+  subtitle?: string;
+  image: string;
+  /** Object-position for the crop; interior art is wide and shallow. */
+  focalPoint?: Hero["media"]["focalPointDesktop"];
+  id?: string;
+}
+
+const {
+  eyebrow,
+  title,
+  subtitle,
+  image,
+  focalPoint = "50% 50%",
+  id = "page-title",
+}: Props = Astro.props;
+---
+
+<section class="ihero" aria-labelledby={id}>
+  <img
+    class="ihero__image"
+    src={image}
+    alt=""
+    width="2048"
+    height="878"
+    fetchpriority="high"
+    decoding="async"
+    style={`object-position: ${focalPoint}`}
+  />
+
+  <div class="ihero__scrim" aria-hidden="true"></div>
+
+  <div class="ihero__content container">
+    {eyebrow && <p class="eyebrow ihero__eyebrow">{eyebrow}</p>}
+    <h1 class="ihero__title" id={id}>{title}</h1>
+    {subtitle && <p class="ihero__subtitle measure">{subtitle}</p>}
+  </div>
+</section>
+
+{/*
+  Marks where the hero ends so the overlay header switches to its solid state.
+  Without it the header stays transparent for the whole page and its white
+  label sits invisibly on white content once you scroll past the hero.
+*/}
+<div data-header-sentinel aria-hidden="true"></div>
+
+<style>
+  .ihero {
+    position: relative;
+    display: grid;
+    align-items: end;
+    min-height: clamp(20rem, 52svh, 34rem);
+    isolation: isolate;
+    background-color: var(--navy-950);
+    color: var(--text-on-dark);
+    overflow: hidden;
+  }
+
+  .ihero__image,
+  .ihero__scrim {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  .ihero__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ihero__scrim {
+    background: var(--hero-overlay);
+  }
+
+  .ihero__content {
+    padding-block: var(--space-8) var(--space-7);
+    display: grid;
+    justify-items: start;
+    gap: var(--space-3);
+  }
+
+  .ihero__eyebrow {
+    color: var(--yellow-500);
+  }
+
+  .ihero__title {
+    font-family: var(--font-expressive);
+    font-size: var(--text-5xl);
+    font-style: italic;
+    font-weight: var(--weight-bold);
+    line-height: 0.95;
+    letter-spacing: var(--tracking-tight);
+    color: var(--white);
+    text-wrap: balance;
+  }
+
+  .ihero__subtitle {
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--text-on-dark-muted);
+  }
+</style>

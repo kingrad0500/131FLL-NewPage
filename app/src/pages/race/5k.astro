@@ -1,0 +1,17 @@
+---
+import AppShell from "../../layouts/AppShell.astro";
+import RaceDetail from "../../components/RaceDetail.astro";
+import { fiveKPage } from "../../content/races.ts";
+---
+
+<AppShell
+  title="5K — Fort Lauderdale 13.1"
+  description="The Fort Lauderdale 13.1 5K: a 7:00 AM start at Las Olas and A1A, three point one miles on the beach road, and the same finish line."
+  headerVariant="overlay"
+>
+  <RaceDetail
+    page={fiveKPage}
+    registerCopy="Entries are handled on RunSignup. The 5K is capped, so it closes when it fills."
+    showArtwork={false}
+  />
+</AppShell>

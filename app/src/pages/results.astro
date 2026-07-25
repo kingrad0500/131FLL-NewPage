@@ -1,0 +1,105 @@
+---
+/**
+ * Results & Photos — a router out to the results host.
+ */
+import AppShell from "../layouts/AppShell.astro";
+import InteriorHero from "../components/InteriorHero.astro";
+import ResultsArchive from "../components/ResultsArchive.astro";
+import CTAGroup from "../components/CTAGroup.astro";
+import { GENERATED } from "../lib/placeholder.ts";
+import { event } from "../content/event.ts";
+import { clockVsChip, resultsArchive } from "../content/results.ts";
+
+const heroImage = GENERATED(
+  "/assets/heroes/interior-results.avif",
+  "Interior hero — Results & Photos",
+);
+---
+
+<AppShell
+  title="Results & Photos — Fort Lauderdale 13.1"
+  description="Fort Lauderdale 13.1 race results by year and distance, plus official race photos."
+  headerVariant="overlay"
+>
+  <InteriorHero
+    eyebrow="Results & Photos"
+    title="How your morning went"
+    subtitle="Every distance, every year, and the photos to prove it."
+    image={heroImage}
+  />
+
+  <section class="section section--light" aria-labelledby="results-title">
+    <div class="container">
+      <p class="eyebrow">Race Results</p>
+      <h2 class="section__title" id="results-title">Find your time</h2>
+      <p class="measure results__lede">
+        Results are hosted on Athlinks. Pick your year and distance below —
+        each link opens the full finisher list, searchable by name or bib.
+      </p>
+
+      <ResultsArchive archive={resultsArchive} />
+    </div>
+  </section>
+
+  <section class="section section--warm" aria-labelledby="photos-title">
+    <div class="container photos">
+      <div>
+        <p class="eyebrow">Race Photos</p>
+        <h2 class="section__title" id="photos-title">Official race photos</h2>
+        <p class="measure photos__body">
+          Photographers cover the course and the finish line. Search the gallery
+          by bib number to find yours.
+        </p>
+      </div>
+      <CTAGroup
+        actions={[
+          {
+            label: "Browse race photos",
+            href: event.photosUrl,
+            priority: "secondary",
+            external: true,
+          },
+        ]}
+      />
+    </div>
+  </section>
+
+  <section class="section section--muted" aria-labelledby="timing-title">
+    <div class="container">
+      <p class="eyebrow">Reading Your Result</p>
+      <h2 class="section__title" id="timing-title">Clock time and chip time</h2>
+      <p class="measure timing__body">{clockVsChip}</p>
+    </div>
+  </section>
+</AppShell>
+
+<style>
+  .results__lede,
+  .photos__body {
+    margin-block-start: var(--space-4);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    color: var(--text-secondary);
+  }
+
+  .photos {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.6fr);
+    gap: var(--space-8);
+    align-items: center;
+  }
+
+  .timing__body {
+    margin-block-start: var(--space-4);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    color: var(--text-secondary);
+  }
+
+  @media (max-width: 52rem) {
+    .photos {
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+    }
+  }
+</style>

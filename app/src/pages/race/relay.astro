@@ -1,0 +1,17 @@
+---
+import AppShell from "../../layouts/AppShell.astro";
+import RaceDetail from "../../components/RaceDetail.astro";
+import { relayPage } from "../../content/races.ts";
+---
+
+<AppShell
+  title="Half Marathon Relay — Fort Lauderdale 13.1"
+  description="Split the Fort Lauderdale 13.1 with a teammate: a 6:15 AM start, an exchange on A1A, and a finish line you cross together."
+  headerVariant="overlay"
+>
+  <RaceDetail
+    page={relayPage}
+    registerCopy="Relay teams enter on RunSignup. One entry covers both runners."
+    showArtwork={false}
+  />
+</AppShell>

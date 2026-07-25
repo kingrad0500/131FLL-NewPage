@@ -1,0 +1,201 @@
+---
+/**
+ * Race overview — the hub for the four distances and the schedule.
+ */
+import AppShell from "../../layouts/AppShell.astro";
+import InteriorHero from "../../components/InteriorHero.astro";
+import CTAGroup from "../../components/CTAGroup.astro";
+import Provisional from "../../components/Provisional.astro";
+import { racePages } from "../../content/races.ts";
+import { GENERATED } from "../../lib/placeholder.ts";
+import { registerAction } from "../../content/event.ts";
+import { distances } from "../../content/distances.ts";
+
+const heroImage = GENERATED(
+  "/assets/heroes/interior-race.avif",
+  "Interior hero — Race overview",
+);
+
+/** Pair each distance page with its start time and price from the rail data. */
+const cards = racePages.map((page) => {
+  const distance = distances.find((d) => d.detailsUrl === page.slug);
+  return {
+    href: page.slug,
+    title: page.title,
+    subtitle: page.subtitle,
+    startTime: distance?.startTime ?? "",
+    price: distance?.price ?? "",
+  };
+});
+---
+
+<AppShell
+  title="The Race — Fort Lauderdale 13.1"
+  description="Four distances on one oceanfront course: the half marathon, the two-person relay, the 10K, and the 5K. Sunday, November 8, 2026."
+  headerVariant="overlay"
+>
+  <InteriorHero
+    eyebrow="The Race"
+    title="Four distances, one finish line"
+    subtitle="Whichever one you pick, it ends on the beach."
+    image={heroImage}
+  />
+
+  <section class="section section--light" aria-labelledby="distances-title">
+    <div class="container">
+      <p class="eyebrow">Choose Your Distance</p>
+      <h2 class="section__title" id="distances-title">Pick your morning</h2>
+      <p class="measure race-intro">
+        Every distance starts and finishes at Las Olas &amp; A1A, runs the same
+        stretch of Fort Lauderdale coastline, and shares the same post-race
+        festival. The only question is how far you want to go.
+      </p>
+
+      <ul class="cards" role="list">
+        {
+          cards.map((card) => (
+            <li>
+              <a class="card u-unstyled-link" href={card.href}>
+                <h3 class="card__title">{card.title}</h3>
+                <p class="card__subtitle">{card.subtitle}</p>
+                <dl class="card__meta">
+                  <div>
+                    <dt>Start</dt>
+                    <dd>
+                      <Provisional value={card.startTime} />
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Entry</dt>
+                    <dd>
+                      <Provisional value={card.price} />
+                    </dd>
+                  </div>
+                </dl>
+                <span class="card__more">Race details</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--warm" aria-labelledby="schedule-title">
+    <div class="container schedule-promo">
+      <div>
+        <p class="eyebrow">Race Weekend</p>
+        <h2 class="section__title" id="schedule-title">
+          Packet pickup to post-race party
+        </h2>
+        <p class="measure">
+          Packet pickup runs Saturday, November 7 at the Downtown Events Center,
+          with race-morning pickup at the start. The full timeline — start
+          times, the relay exchange, when the course closes — is on the
+          schedule.
+        </p>
+      </div>
+      <CTAGroup
+        actions={[
+          { label: "View the schedule", href: "/race/schedule", priority: "secondary" },
+          registerAction,
+        ]}
+      />
+    </div>
+  </section>
+</AppShell>
+
+<style>
+  .race-intro {
+    margin-block: var(--space-4) var(--space-8);
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--text-secondary);
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: var(--space-5);
+  }
+
+  .card {
+    display: grid;
+    align-content: start;
+    gap: var(--space-3);
+    block-size: 100%;
+    padding: var(--space-6);
+    background-color: var(--surface-raised, #fff);
+    border: var(--border-width) solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    transition:
+      border-color var(--duration-micro) var(--ease-standard),
+      transform var(--duration-micro) var(--ease-standard);
+  }
+
+  .card:hover {
+    border-color: var(--accent-coastal-on-light);
+    transform: translateY(-3px);
+  }
+
+  .card__title {
+    font-size: var(--text-2xl);
+  }
+
+  .card__subtitle {
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    color: var(--text-secondary);
+  }
+
+  .card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-6);
+    margin-block-start: var(--space-2);
+  }
+
+  .card__meta dt {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  .card__meta dd {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+  }
+
+  .card__more {
+    margin-block-start: var(--space-3);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    color: var(--accent-coastal-on-light);
+  }
+
+  .schedule-promo {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.6fr);
+    gap: var(--space-8);
+    align-items: center;
+  }
+
+  @media (max-width: 52rem) {
+    .schedule-promo {
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card {
+      transition: none;
+    }
+
+    .card:hover {
+      transform: none;
+    }
+  }
+</style>

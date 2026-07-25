@@ -1,0 +1,272 @@
+---
+/**
+ * Race schedule — the weekend timeline, packet pickup, and timing.
+ */
+import AppShell from "../../layouts/AppShell.astro";
+import InteriorHero from "../../components/InteriorHero.astro";
+import Provisional from "../../components/Provisional.astro";
+import CTAGroup from "../../components/CTAGroup.astro";
+import { GENERATED } from "../../lib/placeholder.ts";
+import { registerAction } from "../../content/event.ts";
+import {
+  bibRules,
+  chipTiming,
+  packetContents,
+  packetPickup,
+  pickupRules,
+  raceDay,
+  raceDaySchedule,
+} from "../../content/schedule.ts";
+
+const heroImage = GENERATED(
+  "/assets/heroes/interior-schedule.avif",
+  "Interior hero — Race schedule",
+);
+---
+
+<AppShell
+  title="Schedule — Fort Lauderdale 13.1"
+  description="Race weekend timeline for the Fort Lauderdale 13.1: packet pickup on Saturday, November 7, start times on Sunday, November 8, and the post-race festival."
+  headerVariant="overlay"
+>
+  <InteriorHero
+    eyebrow="Race Weekend"
+    title="Schedule"
+    subtitle="From packet pickup to the post-race party."
+    image={heroImage}
+  />
+
+  <section class="section section--light" aria-labelledby="raceday-title">
+    <div class="container">
+      <p class="eyebrow">Race Day</p>
+      <h2 class="section__title" id="raceday-title">{raceDay.date}</h2>
+      <p class="venue">
+        {raceDay.venue} · {raceDay.address}
+        <span class="venue__start">Start line: {raceDay.startLine}</span>
+      </p>
+
+      <ol class="timeline" role="list">
+        {
+          raceDaySchedule.map((entry) => (
+            <li class="timeline__row">
+              <span class="timeline__time">
+                <Provisional value={entry.time} />
+              </span>
+              <span class="timeline__body">
+                <span class="timeline__label">{entry.label}</span>
+                {entry.detail && <span class="timeline__detail">{entry.detail}</span>}
+              </span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--warm" aria-labelledby="pickup-title">
+    <div class="container">
+      <p class="eyebrow">Before You Run</p>
+      <h2 class="section__title" id="pickup-title">Packet pickup</h2>
+
+      <div class="pickups">
+        {
+          packetPickup.map((window) => (
+            <article class="pickup">
+              <h3 class="pickup__day">{window.day}</h3>
+              <p class="pickup__hours">{window.hours}</p>
+              <p class="pickup__venue">
+                <strong>{window.venue}</strong>
+                <span>{window.address}</span>
+              </p>
+              {window.note && <p class="pickup__note measure">{window.note}</p>}
+            </article>
+          ))
+        }
+      </div>
+
+      <ul class="rules" role="list">
+        {pickupRules.map((rule) => <li class="rules__item">{rule}</li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--light" aria-labelledby="packet-title">
+    <div class="container packet">
+      <div>
+        <p class="eyebrow">In Your Packet</p>
+        <h2 class="section__title" id="packet-title">What you collect</h2>
+        <ul class="rules" role="list">
+          {packetContents.map((item) => <li class="rules__item">{item}</li>)}
+        </ul>
+      </div>
+
+      <div>
+        <p class="eyebrow">Your Bib</p>
+        <h2 class="section__title">Wear it right</h2>
+        <ul class="rules" role="list">
+          {bibRules.map((rule) => <li class="rules__item">{rule}</li>)}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--muted" aria-labelledby="timing-title">
+    <div class="container">
+      <p class="eyebrow">Timing</p>
+      <h2 class="section__title" id="timing-title">Chip timing</h2>
+      <p class="measure timing__body">{chipTiming}</p>
+    </div>
+  </section>
+
+  <section class="section section--dark" aria-labelledby="schedule-cta">
+    <div class="container schedule__cta">
+      <h2 class="section__title" id="schedule-cta">See you on the line</h2>
+      <CTAGroup
+        actions={[
+          registerAction,
+          { label: "Race details", href: "/race", priority: "secondary" },
+        ]}
+      />
+    </div>
+  </section>
+</AppShell>
+
+<style>
+  .venue {
+    display: grid;
+    gap: var(--space-1, 0.25rem);
+    margin-block: var(--space-3) var(--space-8);
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+  }
+
+  .venue__start {
+    font-weight: var(--weight-bold);
+    color: var(--text-primary);
+  }
+
+  .timeline {
+    display: grid;
+    border-block-start: var(--border-width) solid var(--border-subtle);
+  }
+
+  .timeline__row {
+    display: grid;
+    grid-template-columns: minmax(0, 0.3fr) minmax(0, 1fr);
+    gap: var(--space-5);
+    padding-block: var(--space-4);
+    border-block-end: var(--border-width) solid var(--border-subtle);
+  }
+
+  .timeline__time {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-wide);
+    color: var(--accent-coastal-on-light);
+  }
+
+  .timeline__body {
+    display: grid;
+    gap: var(--space-1, 0.25rem);
+  }
+
+  .timeline__label {
+    font-size: var(--text-base);
+    font-weight: var(--weight-medium);
+  }
+
+  .timeline__detail {
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+    color: var(--text-secondary);
+  }
+
+  .pickups {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    gap: var(--space-6);
+    margin-block: var(--space-7) var(--space-7);
+  }
+
+  .pickup {
+    display: grid;
+    align-content: start;
+    gap: var(--space-2);
+    padding: var(--space-6);
+    background-color: var(--surface-raised, #fff);
+    border: var(--border-width) solid var(--border-subtle);
+    border-radius: var(--radius-md);
+  }
+
+  .pickup__day {
+    font-size: var(--text-lg);
+  }
+
+  .pickup__hours {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    color: var(--accent-coastal-on-light);
+  }
+
+  .pickup__venue {
+    display: grid;
+    gap: 0.15rem;
+    font-size: var(--text-base);
+  }
+
+  .pickup__venue span {
+    color: var(--text-secondary);
+  }
+
+  .pickup__note {
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+    color: var(--text-secondary);
+  }
+
+  .rules {
+    display: grid;
+    gap: var(--space-3);
+    margin-block-start: var(--space-5);
+  }
+
+  .rules__item {
+    position: relative;
+    padding-inline-start: var(--space-6);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+  }
+
+  .rules__item::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-start: 0.55em;
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+    border-radius: 50%;
+    background-color: var(--accent-sun-on-light);
+  }
+
+  .packet {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    gap: var(--space-9) var(--space-8);
+    align-items: start;
+  }
+
+  .timing__body {
+    margin-block-start: var(--space-4);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    color: var(--text-secondary);
+  }
+
+  .schedule__cta {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-4);
+  }
+</style>

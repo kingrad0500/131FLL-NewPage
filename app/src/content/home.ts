@@ -31,6 +31,48 @@ export const homeHero: Hero = {
     focalPointDesktop: "50% 50%",
     focalPointMobile: "50% 40%",
   },
+  // GalleryHero bento cells (agents/hero-gallery-spec.md, DEC-013). Picks
+  // approved 2026-07-25; chosen so nothing repeats imagery used further down
+  // the homepage. Order matters: cells 2 and 3 are tall, so they take the
+  // people-facing frames that survive a portrait crop, while the wide cells
+  // take the landscapes.
+  gallery: [
+    {
+      src: GENERATED(
+        "/assets/heroes/hero-desktop.avif",
+        "Gallery hero cell — oceanfront pack (large cell)",
+      ),
+      alt: "Runners along the Fort Lauderdale oceanfront at sunrise",
+    },
+    {
+      src: GENERATED(
+        "/assets/heroes/interior-5k.avif",
+        "Gallery hero cell — family fun run",
+      ),
+      alt: "Families and kids running together on a city street",
+    },
+    {
+      src: GENERATED(
+        "/assets/heroes/interior-results.avif",
+        "Gallery hero cell — finisher medals",
+      ),
+      alt: "Three finishers laughing with medals around their necks",
+    },
+    {
+      src: GENERATED(
+        "/assets/heroes/interior-relay.avif",
+        "Gallery hero cell — relay pair",
+      ),
+      alt: "Two runners side by side on a coastal road",
+    },
+    {
+      src: GENERATED(
+        "/assets/heroes/interior-10k.avif",
+        "Gallery hero cell — palm-lined road",
+      ),
+      alt: "Palm-lined road running toward turquoise ocean water",
+    },
+  ],
   eyebrow: dateLocationLabel,
   title: "Run the Coast",
   subtitle:

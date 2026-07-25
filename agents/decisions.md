@@ -97,6 +97,7 @@ Use this file for product, design, content, and engineering decisions. Do not us
 - Evidence/source: The event lockup reads "…Liquid Youth 13.1 … **Presented by** Baptist Health"; product-owner direction 2026-07-25: "Both. But put more relevance on Baptist Health."
 - Consequences: `SponsorShowcase` tier structure is final; Baptist Health leads the showcase.
 - Blocks: Nothing.
+- Challenged and reaffirmed 2026-07-25: the live site at `131fortlauderdale.com` names **Broward Health** as "Official Medical Provider" on both its homepage and sponsors page, and does not mention Baptist Health anywhere; the 2025 packet-pickup expo was Baptist-Health-branded and the Facebook slug still reads Cleveland Clinic, so the partnership has changed hands more than once. That evidence was put to the product owner, who directed: *"Baptist Health is the official and most important sponsor. What other pages said, do not follow that."* The live site is treated as out of date and the tiering above stands unchanged. Recorded here because publishing the wrong medical partner would misrepresent a commercial relationship — if this is ever revisited, start from this note.
 
 ### DEC-007 — "Running Festival" sub-brand
 
@@ -162,11 +163,24 @@ Use this file for product, design, content, and engineering decisions. Do not us
   - All four distances active. 13.1 & Relay 6:15 AM; 10K & 5K 7:00 AM; festival opens 7:00 AM; relay teammate 2 at the exchange by 6:45 AM.
   - Pricing incl. sign-up fees: 13.1 $80+$7.00 · Relay $110/team+$9.03 · 10K $55+$5.31 · 5K $40+$4.30.
   - Registration `https://runsignup.com/fortlauderdale131`; results `…/Race/Results/Overview/83064`; photos `…/Race/FortLauderdale131/Page-2`.
-  - Contact `Josh@splitsecondtiming.com`; volunteers `Lorraine@exclusivesports.com`; Facebook page (slug predates current sponsor naming — confirmed current); Instagram `wildsideonline`.
+  - Contact `info@131FortLauderdale.com` (corrected by the product owner 2026-07-25, replacing `Josh@splitsecondtiming.com`); volunteers `Lorraine@exclusivesports.com`; Facebook page (slug predates current sponsor naming — confirmed current); Instagram `wildsideonline`.
 - Open items: **Festival programming, vendors, and closing hours** — the one remaining `[TBD]` on the site.
 - Evidence/source: Product-owner checklist responses, 2026-07-25.
 - Consequences: Countdown, ticker, distance rail, registration path, contact, and social links are live data. The audit's unresolved count drops from 25 to 1.
 - Blocks: Production content only via the single open item and DEC-011 media.
+
+### DEC-014 — Interior page system (Phase 8)
+
+- Date: 2026-07-25
+- Status: approved
+- Owner: Product owner / Engineering
+- Decision or question: What layout system carries the nine MVP interior routes?
+- Options considered: One-off layouts per route / a shared page system approved on a representative page first.
+- Current choice: **Shared system, approved on `/race/13-1` first** (`plan.md` Phase 8). `InteriorHero` opens every route at ~52svh; `RaceDetail` renders any distance from a `RacePage` data object, so a new distance is a data file rather than a layout. `FaqAccordion` uses native `<details>`/`<summary>` with an animated disclosure and zero JavaScript; `ResultsArchive` leads with the newest year and collapses older ones.
+- Evidence/source: Product-owner approvals 2026-07-25 — legacy copy confirmed real and adaptable, `/registration` built as an informational page with entry still on RunSignup, FAQ as an accordion, results routed out to Athlinks.
+- Consequences: All nine routes exist and every menu destination resolves. Unconfirmed race logistics render as visible `[TBD]` badges (21 at build time) rather than being invented — the audit lists each one. `/registration` was added to the Race navigation group so the page is reachable.
+- Fixed during the build: interior pages had no `data-header-sentinel`, so the overlay header never switched to its solid state and the white MENU control became invisible against page content once scrolled. `InteriorHero` now emits the sentinel.
+- Blocks: Nothing. Production release still blocked by the open `[TBD]` items and DEC-011 media.
 
 ### DEC-012 — Course map source and rendering
 
@@ -180,4 +194,18 @@ Use this file for product, design, content, and engineering decisions. Do not us
 - Consequences: Course pages get honest, crisp maps. The legacy screenshot (`maps/course-screenshot-2024.png`) is reference only.
 - Open items: (1) organizer confirmation that the 2024 course line + 2025 relay exchange hold for 2026; (2) owner confirmation of per-distance derivation logic (10K = shared miles 1–6 + marked split; 5K = out-and-back at the marked turnaround; Relay = full course with exchange) before per-distance maps are produced.
 - Blocks: Per-distance maps; wiring maps into the site (course pages not yet built).
+
+### DEC-013 — Component inspiration policy and the GalleryHero
+
+- Date: 2026-07-25
+- Status: approved
+- Owner: Product owner / Engineering
+- Decision or question: May third-party UI galleries (21st.dev et al.) drive component design, and how is the homepage hero evolving?
+- Options considered: Adopt React + Tailwind + shadcn stack / one-off React island / recreate patterns natively with project tools.
+- Current choice: **Recreate natively.** Galleries are treated as pattern libraries — the idea is borrowed, the implementation is ours (Astro, design tokens, scoped CSS, minimal or zero JS). First application: `GalleryHero.astro`, a native recreation of the 21st.dev "hero-gallery-scroll-animation" bento pattern per `agents/hero-gallery-spec.md`. Owner-approved parameters: the five approved image picks (all `GENERATED()`-gated), 220svh scroll length (180svh mobile), and a static composition for reduced motion.
+- Amendment 2026-07-25: the no-support fallback was originally the static composition (zero JavaScript). Firefox 153 was then confirmed to support **none** of the five properties the native path needs, so the owner asked for parity across browsers. A 1.1 KB inline script now drives the identical reveal where scroll-driven animations are unavailable; it exits immediately when they are, so Chromium remains script-free and reduced-motion users keep the static composition. Verified in real Chrome and Firefox, including the reduced-motion path.
+- Evidence/source: Product-owner direction 2026-07-25; spec approvals 1–3 the same day.
+- Consequences: The homepage swaps `MediaHero` → `GalleryHero`; `MediaHero` remains for interior pages. The audit's generated count rises 13 → 17 (four staged interior-hero images now referenced). Deeply stateful widgets (comboboxes, tables, pickers) are out of scope for native recreation and require a fresh decision if ever wanted.
+- Second application 2026-07-25 — **StoryScroller sticky sequence**, adapted from the 21st.dev "scroll-01" pattern. This is the Phase 9 enhancement the component was always scaffolded for (`plan.md` step 9): on desktop a sticky media panel holds one image while the five steps scroll past, cross-fading as each reaches mid-screen. Owner-approved parameters: inactive steps dim to 45% rather than fading out, media panel left with text right, roughly three screens of scroll (measured 307svh), and only the active image exposed to assistive technology. Driven by **IntersectionObserver**, not scroll-driven CSS — "which step is centred" is a discrete question and IO is supported everywhere, so unlike the hero this needs no second code path. The plain alternating stack remains the baseline for mobile, reduced motion, and no-JavaScript, and a step still awaiting media disables the panel rather than showing gaps. Verified in Chrome and Firefox at desktop, plus mobile and reduced-motion.
+- Blocks: Nothing.
 

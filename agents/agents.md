@@ -75,14 +75,16 @@ Read these files before designing or implementing:
 - `idea.md`: analysis of Shamrock Run Fest’s modern visual hierarchy, video, ticker, menu, scrolling scenes, distance rail, partner motion, and animation architecture.
 - `agents.md`: this document; the authoritative implementation and quality standard.
 - `plan.md`: phased execution order, required inputs, deliverables, and approval gates.
+- `content-tree.md`: extracted route hierarchy, page purposes, navigation projection, and content-migration branches.
 
 Priority when documents overlap:
 
 1. This `agents.md`.
 2. Current product-owner direction.
 3. `plan.md` for the currently authorized phase and handoff requirements.
-4. `frontend.md` for observed Fort Lauderdale content and route references.
-5. `idea.md` for inspiration and interaction patterns.
+4. `content-tree.md` for the current route and content hierarchy.
+5. `frontend.md` for observed Fort Lauderdale content and route references.
+6. `idea.md` for inspiration and interaction patterns.
 
 Do not carry old-site defects into the new product.
 
