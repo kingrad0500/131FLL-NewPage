@@ -4,8 +4,20 @@ Every asset the build is currently missing, with the prompt and specification
 needed to produce it. Written so it can be executed either by an agent driving
 a generation tool or by a person working in a web UI.
 
-Status: awaiting a connected generation tool. Scope approved 2026-07-24 —
-photorealistic, registered as generated, release-blocking (DEC-011).
+Status: **executed 2026-07-25** via the Higgsfield MCP server (Soul 2.0,
+~0.12 credits/image; ~4.7 credits total including rerolls and one 4k
+upscale). All 21 stills produced, retouched, converted, and integrated —
+see "Generated interim assets" in `agents/asset-manifest.md` for per-asset
+notes and deviations. The optional hero video was **not** attempted: no
+local ffmpeg to guarantee the <8 MB / silent spec, and the photo hero
+degrades correctly. Scope approved 2026-07-24 — photorealistic, registered
+as generated, release-blocking (DEC-011).
+
+Prompt lesson recorded for future regens: this model treats negated nouns
+("no bibs") as attractors when the scene implies a race. What works:
+recast the scene so the prior disappears (training run, friends, from
+behind, silhouette), describe clothing as "plain solid-colour, completely
+blank fabric", and avoid the words "race", "finish", "corral" entirely.
 
 ## Ground rules
 

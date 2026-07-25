@@ -1,12 +1,10 @@
-import { TBD } from "../lib/placeholder.ts";
 import type { Sponsor, SponsorTier } from "./types.ts";
 
 /**
- * Sponsor tiering is UNRESOLVED (DEC-006). The event lockup reads "Presented
- * by Baptist Health" while agents.md 6.10 and frontend.md 6.18 tier Liquid
- * Youth as title sponsor with Baptist Health as official medical provider.
- * The tiers below follow the specification; they must be verified before
- * release because publishing the wrong tier misrepresents a relationship.
+ * Tiering confirmed by the product owner 2026-07-25 (DEC-006): Baptist Health
+ * and Liquid Youth are both top-tier, with Baptist Health given greater
+ * prominence — "Presented by" renders first and largest, Liquid Youth follows
+ * as Title Partner. Sponsor URLs confirmed the same day (DEC-004).
  *
  * `assetReady: false` omits a sponsor from rendering entirely. AGENTS.md
  * forbids broken images, empty frames, and missing-image labels, so a sponsor
@@ -14,26 +12,28 @@ import type { Sponsor, SponsorTier } from "./types.ts";
  */
 export const sponsors: Sponsor[] = [
   {
-    name: "Liquid Youth",
-    logo: "/assets/partners/liquid-youth.png",
-    logoWidth: 648,
-    logoHeight: 231,
-    alt: "Liquid Youth",
-    url: TBD("Liquid Youth URL", "DEC-004"),
+    name: "Baptist Health",
+    logo: "/assets/partners/baptist-health.png",
+    // Trimmed + downscaled from the owner-supplied transparent original
+    // (assets/partners/"Baptist Health logo - No Background.png").
+    logoWidth: 880,
+    logoHeight: 303,
+    alt: "Baptist Health",
+    url: "https://baptisthealth.net/",
     tier: "presenting",
     active: true,
     assetReady: true,
   },
   {
-    name: "Baptist Health",
-    logo: null,
-    alt: "Baptist Health",
-    url: TBD("Baptist Health URL", "DEC-004"),
-    tier: "medical",
+    name: "Liquid Youth",
+    logo: "/assets/partners/liquid-youth.png",
+    logoWidth: 648,
+    logoHeight: 231,
+    alt: "Liquid Youth",
+    url: "https://myliquidyouth.com/",
+    tier: "title",
     active: true,
-    assetReady: false,
-    assetNote:
-      "Available file is a 2048x706 JPEG with no alpha channel. It renders as a white rectangle on navy surfaces. Needs a transparent PNG or SVG.",
+    assetReady: true,
   },
   {
     name: "Visit Lauderdale",
@@ -42,7 +42,20 @@ export const sponsors: Sponsor[] = [
     logoWidth: 440,
     logoHeight: 140,
     alt: "Visit Lauderdale",
-    url: TBD("Visit Lauderdale URL", "DEC-004"),
+    url: "https://www.visitlauderdale.com/",
+    tier: "supporting",
+    active: true,
+    assetReady: true,
+  },
+  {
+    name: "Dole",
+    logo: "/assets/partners/dole.png",
+    // Trimmed + downscaled from the owner-supplied transparent original
+    // (assets/partners/"DOLE logo No background.png").
+    logoWidth: 480,
+    logoHeight: 321,
+    alt: "Dole",
+    url: "https://www.dole.com/",
     tier: "supporting",
     active: true,
     assetReady: true,
@@ -51,23 +64,12 @@ export const sponsors: Sponsor[] = [
     name: "Fort Lauderdale Beach BID",
     logo: null,
     alt: "Fort Lauderdale Beach BID",
-    url: TBD("Fort Lauderdale Beach BID URL", "DEC-004"),
+    url: "https://www.broward.org/Arts/CulturalOrganizations/Pages/organization.aspx?org=1408",
     tier: "supporting",
     active: true,
     assetReady: false,
     assetNote:
-      "Available file is 175x75 JPEG with no alpha. Too small to render without visible degradation. Needs a current original.",
-  },
-  {
-    name: "Dole",
-    logo: null,
-    alt: "Dole",
-    url: TBD("Dole URL", "DEC-004"),
-    tier: "supporting",
-    active: true,
-    assetReady: false,
-    assetNote:
-      "Available file is 136x91 PNG with no alpha, identified from the archive's ds_P6ob.png. Sponsor identity and current status both unconfirmed.",
+      "File supplied 2026-07-25 is an AI-reconstructed enlargement with halo artifacts and text clipped mid-letter at the right edge — unfit to represent the partner's mark. Awaiting an original from the BID; the URL is wired so it publishes the moment a clean file lands.",
   },
 ];
 
@@ -77,8 +79,8 @@ export const sponsors: Sponsor[] = [
  * over it, so a new tier cannot silently fail to render.
  */
 export const sponsorTiers = [
-  { id: "presenting", label: "Presenting Partner", size: "lg" },
-  { id: "medical", label: "Official Medical Partner", size: "lg" },
+  { id: "presenting", label: "Presented by", size: "lg" },
+  { id: "title", label: "Title Partner", size: "lg" },
   { id: "supporting", label: "Supporting Partners", size: "sm" },
 ] as const satisfies readonly {
   id: SponsorTier;

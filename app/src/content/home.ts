@@ -1,4 +1,4 @@
-import { TBD } from "../lib/placeholder.ts";
+import { GENERATED, TBD } from "../lib/placeholder.ts";
 import { dateLocationLabel, event, registerAction } from "./event.ts";
 import type { CTA, EditorialBlock, FeatureBlock, Hero } from "./types.ts";
 
@@ -11,12 +11,22 @@ import type { CTA, EditorialBlock, FeatureBlock, Hero } from "./types.ts";
  */
 export const homeHero: Hero = {
   media: {
-    // No approved footage exists yet (DEC-005). MediaHero degrades to its
-    // static path automatically when video and poster are both null.
+    // No approved footage exists yet (DEC-005). The still images below are
+    // AI-generated interim placeholders (DEC-011) — release-blocking until
+    // real photography replaces them.
     video: null,
-    poster: null,
-    desktopImage: null,
-    mobileImage: null,
+    poster: GENERATED(
+      "/assets/heroes/hero-desktop.avif",
+      "Homepage hero poster (doubles as reduced-motion image)",
+    ),
+    desktopImage: GENERATED(
+      "/assets/heroes/hero-desktop.avif",
+      "Homepage hero image — desktop",
+    ),
+    mobileImage: GENERATED(
+      "/assets/heroes/hero-mobile.avif",
+      "Homepage hero image — mobile",
+    ),
     imageAlt: "Runners along the Fort Lauderdale oceanfront at sunrise",
     focalPointDesktop: "50% 50%",
     focalPointMobile: "50% 40%",
@@ -43,8 +53,13 @@ export const editorialIntro: EditorialBlock = {
 export const festival: FeatureBlock = {
   eyebrow: "After the Finish",
   title: "It doesn't end at the finish line",
-  body: "The finish area opens into the running festival: music, food, and a place to find your people once the medal is around your neck.",
-  image: null,
+  // Opening time confirmed by the product owner 2026-07-25; programming,
+  // vendors, and closing hours remain TBD below.
+  body: "From 7:00 AM the finish area opens into the running festival: music, food, and a place to find your people once the medal is around your neck.",
+  image: GENERATED(
+    "/assets/festival/festival.avif",
+    "Festival feature image",
+  ),
   imageAlt: "Post-race festival crowd at the finish area",
   details: TBD("Confirmed festival programming, vendors, and hours"),
 };

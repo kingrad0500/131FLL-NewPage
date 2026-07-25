@@ -52,27 +52,27 @@ Use this file for product, design, content, and engineering decisions. Do not us
 
 ### DEC-003 — Canonical event facts
 
-- Date: 2026-07-24
-- Status: TBD
+- Date: 2026-07-24 · resolved 2026-07-25
+- Status: approved
 - Owner: Product owner
 - Decision or question: Confirm event year, date, location, active distances, start times, and policy sources.
 - Options considered: Not applicable.
-- Current choice: TBD
-- Evidence/source: Current event operations information.
-- Consequences: Controls content, countdown, ticker, navigation, registration, and SEO.
-- Blocks: Production content.
+- Current choice: **Confirmed by the product owner 2026-07-25.** November 8, 2026, Fort Lauderdale FL. 20th edition. Distances 13.1, Relay, 10K, 5K all active. First gun 6:15 AM ET (13.1 & Relay); 10K and 5K at 7:00 AM; festival opens 7:00 AM. Relay teammate 2 must be in the exchange area by 6:45 AM.
+- Evidence/source: Product-owner checklist responses, 2026-07-25 (this conversation).
+- Consequences: Countdown, ticker, distance rail, and SEO now run on confirmed values; the `UNCONFIRMED` markers were removed from `event.ts` and `distances.ts`.
+- Blocks: Nothing.
 
 ### DEC-004 — Archived asset permission
 
-- Date: 2026-07-24
-- Status: TBD
+- Date: 2026-07-24 · resolved 2026-07-25
+- Status: approved
 - Owner: Product owner
 - Decision or question: Which archived event and sponsor assets are approved for reuse?
 - Options considered: Approve individually / replace with current originals.
-- Current choice: TBD
-- Evidence/source: `agents/asset-manifest.md`
-- Consequences: Controls production media and sponsor visibility.
-- Blocks: Production publication of unverified assets.
+- Current choice: **Approved individually 2026-07-25.** Liquid Youth and Visit Lauderdale archived files remain in use. Owner supplied new transparent Baptist Health and Dole files (approved; Dole small-display only). The supplied Beach BID file is an AI-reconstructed enlargement and stays withheld until the BID provides an original. All five sponsor URLs confirmed and wired.
+- Evidence/source: Product-owner responses and files, 2026-07-25; `agents/asset-manifest.md` "Owner-supplied files" section.
+- Consequences: Baptist Health and Dole now render in the showcase; the withheld notice lists only the Beach BID.
+- Blocks: Beach BID visibility only.
 
 ### DEC-005 — Hero media
 
@@ -88,15 +88,15 @@ Use this file for product, design, content, and engineering decisions. Do not us
 
 ### DEC-006 — Sponsor tier conflict: Baptist Health
 
-- Date: 2026-07-24
-- Status: TBD
+- Date: 2026-07-24 · resolved 2026-07-25
+- Status: approved
 - Owner: Product owner
 - Decision or question: Is Baptist Health the *presenting* sponsor or the *official medical partner*? The two available sources disagree.
 - Options considered: Presenting / Official medical partner / Both
-- Current choice: TBD
-- Evidence/source: The event lockup (`assets/brand/fort-lauderdale-13-1-logo.png`) reads "The 19th Annual Liquid Youth 13.1 Fort Lauderdale Running Festival — **Presented by** Baptist Health". `agents.md` §6.10 and `frontend.md` §6.18 instead tier Liquid Youth as title sponsor with Baptist Health as official medical provider.
-- Consequences: Determines the tier structure, ordering, and relative sizing of `SponsorShowcase` / `PartnerTier`. Publishing the wrong tier misrepresents a sponsor relationship.
-- Blocks: Final sponsor showcase; production release.
+- Current choice: **Both, with Baptist Health more prominent** (product owner, 2026-07-25). Tier order: "Presented by" — Baptist Health (first, largest); "Title Partner" — Liquid Youth; then Supporting Partners. The former "medical" tier id was replaced by "title" in `types.ts`/`sponsors.ts`.
+- Evidence/source: The event lockup reads "…Liquid Youth 13.1 … **Presented by** Baptist Health"; product-owner direction 2026-07-25: "Both. But put more relevance on Baptist Health."
+- Consequences: `SponsorShowcase` tier structure is final; Baptist Health leads the showcase.
+- Blocks: Nothing.
 
 ### DEC-007 — "Running Festival" sub-brand
 
@@ -153,20 +153,31 @@ Use this file for product, design, content, and engineering decisions. Do not us
 
 ### DEC-009 — Event facts pending confirmation
 
-- Date: 2026-07-24
-- Status: TBD
+- Date: 2026-07-24 · resolved 2026-07-25 (one item open)
+- Status: approved
 - Owner: Product owner
-- Decision or question: Confirm the specific facts below, which the build currently treats as `[TBD]`.
-- Current choice: TBD
-- Evidence/source: Observed in reference material but unverified.
-- Open items:
-  - Race date. The legacy homepage advertises "November 8th, 2026"; `frontend.md` §11 notes the reference site mixes 2023–2026 dates and a 2017 copyright, so this needs confirmation rather than inheritance.
-  - Edition number. The lockup says "19th Annual" — confirm whether the next running is the 19th or 20th.
-  - Active distances. The shield reads "10K, 5K, HALF, RELAY"; confirm all four are running.
-  - Start times, start locations, and per-distance pricing.
-  - Registration provider and URL.
-  - Results and photo provider URLs.
-  - Contact and volunteer email addresses; social URLs.
-- Consequences: Controls the countdown, ticker, distance rail, schedule, registration path, and SEO.
-- Blocks: Production content.
+- Decision or question: Confirm the specific facts below, which the build previously treated as `[TBD]`.
+- Current choice: **Confirmed by the product owner 2026-07-25** and wired into content:
+  - Race date November 8, 2026; edition **20th Annual** (the lockup artwork still reads 19th and stays in use — updated art requested from the designer alongside DEC-010).
+  - All four distances active. 13.1 & Relay 6:15 AM; 10K & 5K 7:00 AM; festival opens 7:00 AM; relay teammate 2 at the exchange by 6:45 AM.
+  - Pricing incl. sign-up fees: 13.1 $80+$7.00 · Relay $110/team+$9.03 · 10K $55+$5.31 · 5K $40+$4.30.
+  - Registration `https://runsignup.com/fortlauderdale131`; results `…/Race/Results/Overview/83064`; photos `…/Race/FortLauderdale131/Page-2`.
+  - Contact `Josh@splitsecondtiming.com`; volunteers `Lorraine@exclusivesports.com`; Facebook page (slug predates current sponsor naming — confirmed current); Instagram `wildsideonline`.
+- Open items: **Festival programming, vendors, and closing hours** — the one remaining `[TBD]` on the site.
+- Evidence/source: Product-owner checklist responses, 2026-07-25.
+- Consequences: Countdown, ticker, distance rail, registration path, contact, and social links are live data. The audit's unresolved count drops from 25 to 1.
+- Blocks: Production content only via the single open item and DEC-011 media.
+
+### DEC-012 — Course map source and rendering
+
+- Date: 2026-07-25
+- Status: approved (two confirmations pending)
+- Owner: Product owner / Engineering
+- Decision or question: How are course maps produced without violating the ban on fabricated route data?
+- Options considered: Keep legacy screenshot / AI-enhance the screenshot / render from the organizer's GPS data.
+- Current choice: **Render from the organizer's KMZ only; no generative processing of maps, ever** (reaffirms DEC-011's exclusion — AI enhancement was considered and rejected because upscalers invent detail on factual labels). The owner approved the styled full-course render on 2026-07-25 ("that one looks amazing"): CARTO Voyager basemap with attribution, palette-styled route and markers, legend, and a "subject to 2026 confirmation" footnote. Saved as `assets/maps/course-map-full.png`; render script retained in the session scratchpad.
+- Evidence/source: `assets/maps/2025-ly-fort-lauderdale-running-festival.kmz` (organizer GPS data via owner); owner approvals 2026-07-25.
+- Consequences: Course pages get honest, crisp maps. The legacy screenshot (`maps/course-screenshot-2024.png`) is reference only.
+- Open items: (1) organizer confirmation that the 2024 course line + 2025 relay exchange hold for 2026; (2) owner confirmation of per-distance derivation logic (10K = shared miles 1–6 + marked split; 5K = out-and-back at the marked turnaround; Relay = full course with exchange) before per-distance maps are produced.
+- Blocks: Per-distance maps; wiring maps into the site (course pages not yet built).
 

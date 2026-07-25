@@ -1,41 +1,42 @@
-import { TBD, UNCONFIRMED } from "../lib/placeholder.ts";
 import type { CTA, EventFacts } from "./types.ts";
 
-const LEGACY_SITE = "legacy homepage (frontend.md 6.1)";
-const LOCKUP = "event lockup (assets/brand/fort-lauderdale-13-1-logo.png)";
-
+/**
+ * Canonical event facts, confirmed by the product owner 2026-07-25
+ * (DEC-003, DEC-009). Values here are authoritative for the countdown,
+ * ticker, registration path, and SEO.
+ */
 export const event: EventFacts = {
   name: "Fort Lauderdale 13.1",
 
-  // The lockup reads "19th Annual". Whether the next running is the 19th or
-  // the 20th depends on the canonical year, which is itself unconfirmed.
-  edition: UNCONFIRMED("19th Annual", "Event edition", LOCKUP),
+  // Confirmed 20th edition. The supplied lockup artwork still reads
+  // "19th Annual" and remains in use per product-owner direction 2026-07-25;
+  // updated artwork is on the designer request list (see DEC-010 notes).
+  edition: "20th Annual",
 
   city: "Fort Lauderdale",
   state: "FL",
   locationLabel: "Fort Lauderdale, Florida",
 
-  // frontend.md 11 records that the reference site mixes 2023-2026 dates and
-  // still shows a 2017 copyright, so this date is observed, not verified.
-  // Start time is unknown, so 6:00 AM is a placeholder within the timestamp;
-  // the countdown is accurate only once DEC-009 resolves.
-  startsAt: UNCONFIRMED(
-    "2026-11-08T06:00:00-05:00",
-    "Race start date and time",
-    LEGACY_SITE,
-  ),
-  dateLabel: UNCONFIRMED("November 8, 2026", "Race date label", LEGACY_SITE),
+  // First gun: 13.1 & Relay at 6:15 AM ET. The 10K and 5K start at 7:00 AM;
+  // per-distance times live in distances.ts.
+  startsAt: "2026-11-08T06:15:00-05:00",
+  dateLabel: "November 8, 2026",
 
-  registrationUrl: TBD("Registration provider URL"),
-  resultsUrl: TBD("Results provider URL"),
-  photosUrl: TBD("Race photo provider URL"),
+  registrationUrl: "https://runsignup.com/fortlauderdale131",
+  resultsUrl: "https://runsignup.com/Race/Results/Overview/83064",
+  photosUrl: "https://runsignup.com/Race/FortLauderdale131/Page-2",
 
-  contactEmail: TBD("Contact email address"),
-  volunteerEmail: TBD("Volunteer coordinator email address"),
+  contactEmail: "Josh@splitsecondtiming.com",
+  volunteerEmail: "Lorraine@exclusivesports.com",
 
   social: [
-    { label: "Facebook", href: TBD("Facebook URL") },
-    { label: "Instagram", href: TBD("Instagram URL") },
+    {
+      label: "Facebook",
+      // Page slug predates current sponsor naming; confirmed as the event's
+      // current page by the product owner 2026-07-25.
+      href: "https://www.facebook.com/ClevelandClinicFlorida13.1FortLauderdale/",
+    },
+    { label: "Instagram", href: "https://www.instagram.com/wildsideonline" },
   ],
 };
 
