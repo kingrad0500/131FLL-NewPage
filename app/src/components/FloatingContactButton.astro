@@ -1,0 +1,65 @@
+---
+/**
+ * FloatingContactButton — persistent contact affordance.
+ *
+ * Carries an accessible name (the legacy control was an unlabeled icon) and
+ * sits clear of content per the responsive rules. Renders as a link only once
+ * a contact address is confirmed; until then it points at the FAQs/Contact
+ * route rather than a broken mailto.
+ */
+import { event } from "../content/event.ts";
+import { isTBD } from "../lib/placeholder.ts";
+
+const href = isTBD(event.contactEmail)
+  ? "/faqs"
+  : `mailto:${event.contactEmail}`;
+---
+
+<a class="contact-fab u-unstyled-link" href={href}>
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+    <path d="m2 7 10 6 10-6"></path>
+  </svg>
+  <span class="visually-hidden">Contact us</span>
+</a>
+
+<style>
+  .contact-fab {
+    position: fixed;
+    inset-inline-end: var(--space-4);
+    inset-block-end: var(--space-6);
+    z-index: var(--z-floating-contact);
+    display: grid;
+    place-items: center;
+    width: var(--touch-target);
+    height: var(--touch-target);
+    border-radius: var(--radius-pill);
+    background-color: var(--navy-800);
+    color: var(--white);
+    box-shadow: var(--shadow-lg);
+    transition:
+      background-color var(--duration-micro) var(--ease-standard),
+      transform var(--duration-micro) var(--ease-standard);
+  }
+
+  .contact-fab:hover {
+    background-color: var(--aqua-500);
+    color: var(--navy-950);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .contact-fab:hover {
+      transform: translateY(-2px);
+    }
+  }
+</style>

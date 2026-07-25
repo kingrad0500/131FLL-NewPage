@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+
+# Third-party skill installs — reinstallable with `npx skills add`
+.agents/
+.claude/skills/
+*.log
+.env
+.env.*
+!.env.example
+.vercel
+.netlify

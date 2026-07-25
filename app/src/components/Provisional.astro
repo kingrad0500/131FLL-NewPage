@@ -1,0 +1,68 @@
+---
+/**
+ * Renders content that may still be unresolved.
+ *
+ * Pass the resolved rendering as the default slot. When `value` is a [TBD]
+ * marker the slot is discarded and a badge is shown instead; otherwise the
+ * slot renders. This keeps the "is this resolved?" decision in one place —
+ * callers that need a link, a mailto, or any markup no longer have to
+ * re-implement the conditional themselves.
+ *
+ * With no slot, the resolved value renders as plain text.
+ *
+ * The badge is always visible, in every environment. Production release is
+ * blocked by the audit rather than by hiding the badge, so there is no build
+ * mode in which unresolved content can render as if it were real.
+ */
+import { isTBD, stripTBD } from "../lib/placeholder.ts";
+
+interface Props {
+  value: string;
+}
+
+const { value }: Props = Astro.props;
+---
+
+{
+  isTBD(value) ? (
+    <span class="provisional" role="note">
+      <span class="provisional__badge">TBD</span>
+      <span class="provisional__label">{stripTBD(value)}</span>
+    </span>
+  ) : (
+    <slot>{value}</slot>
+  )
+}
+
+<style>
+  .provisional {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 0.15em 0.6em 0.15em 0.3em;
+    border: var(--border-width) dashed var(--coral-500);
+    border-radius: var(--radius-sm);
+    background-color: var(--surface-provisional);
+    font-family: var(--font-mono);
+    font-size: 0.82em;
+    line-height: 1.3;
+    text-transform: none;
+    letter-spacing: 0;
+    vertical-align: baseline;
+  }
+
+  .provisional__badge {
+    padding: 0.1em 0.4em;
+    border-radius: var(--radius-sm);
+    background-color: var(--coral-500);
+    color: var(--ink-950);
+    font-weight: var(--weight-bold);
+    font-size: 0.85em;
+    letter-spacing: 0.04em;
+  }
+
+  .provisional__label {
+    color: inherit;
+    opacity: 0.9;
+  }
+</style>

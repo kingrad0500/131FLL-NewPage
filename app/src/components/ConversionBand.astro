@@ -1,0 +1,46 @@
+---
+/**
+ * ConversionBand — the direct pathways: register, results, photos, schedule.
+ * Priority is explicit so not every action reads as primary.
+ */
+import CTAGroup from "./CTAGroup.astro";
+import { conversionActions } from "../content/home.ts";
+import type { CTA, SectionSurface } from "../content/types.ts";
+
+interface Props {
+  actions?: CTA[];
+  title?: string;
+  body?: string;
+  surface?: SectionSurface;
+  id?: string;
+}
+
+const {
+  actions = conversionActions,
+  title = "Ready when you are",
+  body = "Registration, results, and race-weekend logistics — all in one place.",
+  surface = "warm",
+  id = "conversion",
+}: Props = Astro.props;
+
+const titleId = `${id}-title`;
+---
+
+<section
+  class:list={["conversion", "section", `section--${surface}`]}
+  aria-labelledby={titleId}
+>
+  <div class="container">
+    <h2 class="section__title" id={titleId}>{title}</h2>
+    <p class="conversion__body measure">{body}</p>
+    <CTAGroup actions={actions} />
+  </div>
+</section>
+
+<style>
+  .conversion__body {
+    margin-block: var(--space-3) var(--space-6);
+    font-size: var(--text-lg);
+    color: var(--text-secondary);
+  }
+</style>

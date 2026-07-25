@@ -1,0 +1,103 @@
+---
+/**
+ * AppShell — shared document shell.
+ *
+ * Landmark order: skip link → ticker → header → main → footer. The loader is
+ * fixed and outside the reading order.
+ */
+import BrandLoader from "../components/BrandLoader.astro";
+import EventTicker from "../components/EventTicker.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import ConversionFooter from "../components/ConversionFooter.astro";
+import FloatingContactButton from "../components/FloatingContactButton.astro";
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description: string;
+  headerVariant?: "overlay" | "solid";
+  /** The loader is a homepage-only opening beat. */
+  showLoader?: boolean;
+}
+
+const {
+  title,
+  description,
+  headerVariant = "solid",
+  showLoader = false,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#002B5C" />
+  </head>
+
+  <body>
+    {showLoader && <BrandLoader />}
+
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <div class="topbar" data-topbar>
+      <EventTicker />
+      <SiteHeader variant={headerVariant} />
+    </div>
+
+    <main id="main" class:list={{ "main--offset": headerVariant === "solid" }}>
+      <slot />
+    </main>
+
+    <ConversionFooter />
+    <FloatingContactButton />
+  </body>
+</html>
+
+<style>
+  /*
+   * Ticker and header travel together as one fixed bar. An overlay hero runs
+   * full-bleed underneath it; interior pages reserve the space instead.
+   */
+  .topbar {
+    position: fixed;
+    inset-block-start: 0;
+    inset-inline: 0;
+    z-index: var(--z-header);
+  }
+
+  .main--offset {
+    padding-block-start: var(--topbar-height);
+  }
+</style>
+
+<script>
+  /*
+   * The token in tokens.css is a pre-JS estimate. The real bar can be taller —
+   * under reduced motion the ticker wraps to a static list instead of scrolling
+   * on one line — and an under-reserved offset slides interior page content
+   * beneath the bar for exactly the users who opted out of motion. Measure the
+   * rendered bar and let every consumer of --topbar-height read the true value.
+   */
+  const topbar = document.querySelector<HTMLElement>("[data-topbar]");
+
+  if (topbar) {
+    const syncHeight = () => {
+      document.documentElement.style.setProperty(
+        "--topbar-height",
+        `${topbar.offsetHeight}px`,
+      );
+    };
+
+    new ResizeObserver(syncHeight).observe(topbar);
+    syncHeight();
+  }
+</script>

@@ -1,0 +1,236 @@
+/*
+ * Fort Lauderdale 13.1 — Design tokens
+ *
+ * Color values are PROVISIONAL (AGENTS.md, Brand system). Sample and replace
+ * with official brand values when original assets are available.
+ */
+
+:root {
+  /* ---------------------------------------------------------------------
+   * Color — raw palette
+   * ------------------------------------------------------------------- */
+  --navy-950: #001f45; /* deep backgrounds and overlays */
+  --navy-800: #002b5c; /* primary brand navy */
+  --navy-600: #0a4a8f;
+  --navy-400: #3d7ec4;
+
+  --yellow-500: #ffd200; /* primary action and loading screen */
+  --yellow-300: #ffe66b;
+  --yellow-700: #d9b200;
+
+  --aqua-500: #19b8c4; /* coastal secondary accent */
+  --aqua-300: #6fd9e1;
+
+  --coral-500: #f47a4a; /* festival / warm highlight — use sparingly */
+
+  --sand-100: #f5f0e8; /* warm light canvas */
+  --gray-100: #efefef; /* secondary section background */
+  --gray-300: #cfcfcf;
+  --gray-500: #8a8a8a;
+
+  --ink-950: #151411; /* strong text and dark contrast */
+  --white: #ffffff;
+
+  /* ---------------------------------------------------------------------
+   * Color — semantic roles
+   *
+   * Components reference these, never the raw palette. Swapping a brand
+   * value then propagates everywhere without touching component CSS.
+   * ------------------------------------------------------------------- */
+  --surface-canvas: var(--white);
+  --surface-warm: var(--sand-100);
+  --surface-muted: var(--gray-100);
+  --surface-dark: var(--navy-800);
+  --surface-deepest: var(--navy-950);
+
+  --text-primary: var(--ink-950);
+  --text-secondary: #4a4a4a;
+  --text-on-dark: var(--white);
+  --text-on-dark-muted: rgba(255, 255, 255, 0.72);
+  --text-on-accent: var(--navy-950);
+
+  --action-primary-bg: var(--yellow-500);
+  --action-primary-fg: var(--navy-950);
+  --action-primary-bg-hover: var(--yellow-300);
+
+  --action-secondary-fg: var(--white);
+  --action-secondary-border: rgba(255, 255, 255, 0.55);
+  --action-secondary-bg-hover: rgba(255, 255, 255, 0.12);
+
+  --accent-coastal: var(--aqua-500);
+  --accent-festival: var(--coral-500);
+
+  /*
+   * Darkened accent variants for light surfaces. The raw accents fail contrast
+   * at small sizes on white/sand, so light sections re-point the roles above
+   * to these (see the .section--light group in global.css).
+   */
+  --accent-coastal-on-light: #0f7d86;
+  --accent-festival-on-light: #c8551f;
+  --accent-sun-on-light: #9a7c00;
+
+  /* Tinted fill shared by every provisional/placeholder surface. */
+  --surface-provisional: color-mix(
+    in srgb,
+    var(--accent-festival) 12%,
+    transparent
+  );
+
+  --border-subtle: rgba(0, 31, 69, 0.14);
+  --border-on-dark: rgba(255, 255, 255, 0.18);
+
+  --focus-ring: var(--aqua-500);
+  --focus-ring-on-light: var(--navy-800);
+
+  /* Hero overlay — must hold text contrast across every video frame */
+  --hero-overlay: linear-gradient(
+    to bottom,
+    rgba(0, 31, 69, 0.72) 0%,
+    rgba(0, 31, 69, 0.42) 42%,
+    rgba(0, 31, 69, 0.82) 100%
+  );
+
+  /* ---------------------------------------------------------------------
+   * Typography
+   *
+   * Families are fallback stacks until licensed brand fonts are supplied.
+   * See the "missing" row for fonts in agents/asset-manifest.md.
+   * ------------------------------------------------------------------- */
+  --font-structural: ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Haettenschweiler", "Arial Narrow Bold", "Impact",
+    var(--font-structural);
+  --font-expressive: "Georgia", "Times New Roman", serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+
+  /* Fluid scale — clamp() rather than dozens of fixed sizes */
+  --text-2xs: clamp(0.69rem, 0.67rem + 0.1vw, 0.75rem);
+  --text-xs: clamp(0.75rem, 0.72rem + 0.15vw, 0.83rem);
+  --text-sm: clamp(0.88rem, 0.85rem + 0.15vw, 0.94rem);
+  --text-base: clamp(1rem, 0.96rem + 0.2vw, 1.13rem);
+  --text-lg: clamp(1.13rem, 1.06rem + 0.35vw, 1.31rem);
+  --text-xl: clamp(1.31rem, 1.19rem + 0.6vw, 1.63rem);
+  --text-2xl: clamp(1.56rem, 1.34rem + 1.1vw, 2.25rem);
+  --text-3xl: clamp(1.94rem, 1.53rem + 2vw, 3rem);
+  --text-4xl: clamp(2.38rem, 1.7rem + 3.4vw, 4.25rem);
+  --text-5xl: clamp(2.88rem, 1.75rem + 5.6vw, 6rem);
+  --text-6xl: clamp(3.5rem, 1.6rem + 9.5vw, 8.5rem);
+
+  --leading-tight: 1.04;
+  --leading-snug: 1.18;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.06em;
+  --tracking-wider: 0.14em;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-bold: 700;
+  --weight-black: 900;
+
+  /* Readable measure — 65–75 characters per AGENTS.md */
+  --measure: 68ch;
+  --measure-narrow: 54ch;
+
+  /* ---------------------------------------------------------------------
+   * Spacing — 4px base
+   * ------------------------------------------------------------------- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 2.5rem;
+  --space-8: 3rem;
+  --space-9: 4rem;
+  --space-10: 5rem;
+  --space-11: 6.5rem;
+  --space-12: 8rem;
+
+  /* Fluid section rhythm */
+  --section-padding-block: clamp(3.5rem, 2rem + 6vw, 8rem);
+  --gutter: clamp(1.25rem, 0.75rem + 2.5vw, 2.5rem);
+
+  --container-max: 78rem; /* 1248px */
+  --container-narrow: 52rem;
+
+  /*
+   * The ticker and header form one fixed topbar. Both heights are declared
+   * rather than measured, so interior pages can reserve exactly the right
+   * offset without a layout-shifting measurement pass.
+   */
+  --ticker-height: 2.25rem;
+  --header-height: clamp(4rem, 6vw, 5rem);
+  --topbar-height: calc(var(--ticker-height) + var(--header-height));
+
+  /* ---------------------------------------------------------------------
+   * Radius, borders, elevation
+   * ------------------------------------------------------------------- */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-pill: 999px;
+
+  --border-width: 1px;
+  --border-width-thick: 2px;
+
+  --shadow-sm: 0 1px 2px rgba(0, 31, 69, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 31, 69, 0.1);
+  --shadow-lg: 0 12px 40px rgba(0, 31, 69, 0.16);
+
+  /* ---------------------------------------------------------------------
+   * Motion — AGENTS.md, Motion rules
+   * ------------------------------------------------------------------- */
+  --duration-micro: 200ms; /* 160–240 */
+  --duration-menu: 420ms; /* 350–500 */
+  --duration-section: 750ms; /* 600–900 */
+  --duration-editorial: 850ms; /* 700–1000 */
+  --duration-crossfade: 900ms; /* 600–1200 */
+  --duration-marquee: 32s; /* 20–45 */
+  --duration-marquee-sponsors: 45s;
+
+  --ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-menu: cubic-bezier(0.87, 0, 0.13, 1);
+
+  /*
+   * Loader timing is owned by BrandLoader's props, which write it to both the
+   * element's inline style and its data attributes so CSS and JS read one
+   * source. No loader duration token lives here — two sources desynchronize.
+   */
+
+  /* ---------------------------------------------------------------------
+   * Layering
+   * ------------------------------------------------------------------- */
+  --z-base: 0;
+  --z-sticky: 10;
+  --z-floating-contact: 20;
+  --z-header: 30;
+  --z-menu: 40;
+  --z-loader: 50;
+  --z-skip-link: 60;
+
+  /* Minimum interactive target — accessibility floor */
+  --touch-target: 44px;
+}
+
+/*
+ * Reduced motion collapses every duration to a near-instant value so that
+ * components need no conditional logic for the common case. Components with
+ * structural motion differences (StoryScroller, marquees, hero video) still
+ * branch explicitly on the media query.
+ */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-micro: 1ms;
+    --duration-menu: 1ms;
+    --duration-section: 1ms;
+    --duration-editorial: 1ms;
+    --duration-crossfade: 200ms; /* crossfade stays perceptible but calm */
+  }
+}

@@ -1,0 +1,155 @@
+---
+/**
+ * StoryScroller — the "Sunrise to Finish Line" feature sequence.
+ *
+ * Phase 6 builds this as a plain stack (plan.md, step 9). The sticky desktop
+ * media panel is a Phase 9 enhancement layered on top of this markup, which is
+ * also the permanent mobile and reduced-motion presentation. Building the
+ * stack first guarantees the enhancement has a working baseline to fall back
+ * to rather than a broken one.
+ */
+import PlaceholderMedia from "./PlaceholderMedia.astro";
+import { stories } from "../content/stories.ts";
+import type { SectionSurface, StoryStep } from "../content/types.ts";
+
+interface Props {
+  steps?: StoryStep[];
+  eyebrow?: string;
+  title?: string;
+  surface?: SectionSurface;
+  id?: string;
+}
+
+const {
+  steps = stories,
+  eyebrow = "The Experience",
+  title = "Sunrise to finish line",
+  surface = "light",
+  id = "stories",
+}: Props = Astro.props;
+
+const titleId = `${id}-title`;
+---
+
+<section
+  class:list={["stories", "section", `section--${surface}`]}
+  aria-labelledby={titleId}
+>
+  <div class="container">
+    <p class="eyebrow">{eyebrow}</p>
+    <h2 class="section__title stories__title" id={titleId}>{title}</h2>
+
+    <ol class="stories__list" role="list">
+      {
+        steps.map((story, index) => (
+          <li class="story" data-accent={story.accent}>
+            <div class="story__media">
+              {story.media ? (
+                <img
+                  src={story.media}
+                  alt={story.mediaAlt}
+                  width="960"
+                  height="640"
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : (
+                <PlaceholderMedia
+                  label={`Story image — ${story.title}`}
+                  intendedAlt={story.mediaAlt}
+                  ratio="3 / 2"
+                />
+              )}
+            </div>
+
+            <div class="story__text">
+              <span class="story__index" aria-hidden="true">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <h3 class="story__heading">{story.title}</h3>
+              <p class="measure">{story.body}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .stories__title {
+    margin-block-end: var(--space-9);
+  }
+
+  .stories__list {
+    display: grid;
+    gap: var(--space-10);
+  }
+
+  .story {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-6) var(--space-8);
+    align-items: center;
+  }
+
+  /* Alternate sides so the sequence reads as a rhythm, not a list. */
+  .story:nth-child(even) .story__media {
+    order: 2;
+  }
+
+  .story__text {
+    display: grid;
+    gap: var(--space-3);
+    align-content: start;
+  }
+
+  .story__index {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-wide);
+    color: var(--accent-color, var(--aqua-500));
+  }
+
+  .story[data-accent="aqua"] {
+    --accent-color: var(--accent-coastal-on-light);
+  }
+  .story[data-accent="coral"] {
+    --accent-color: var(--accent-festival-on-light);
+  }
+  .story[data-accent="yellow"] {
+    --accent-color: var(--accent-sun-on-light);
+  }
+
+  .story__heading {
+    font-size: var(--text-2xl);
+  }
+
+  .story__text p {
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    color: var(--text-secondary);
+  }
+
+  .story__media img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-md);
+  }
+
+  @media (max-width: 52rem) {
+    .story {
+      grid-template-columns: 1fr;
+      gap: var(--space-4);
+    }
+
+    .story:nth-child(even) .story__media {
+      order: 0;
+    }
+
+    .stories__list {
+      gap: var(--space-9);
+    }
+  }
+</style>

@@ -1,0 +1,107 @@
+---
+/**
+ * FestivalHighlight — the event beyond the race itself.
+ *
+ * Programming details are [TBD] and render as a marked note rather than as
+ * claims about vendors, music, or hours. AGENTS.md: avoid unsupported
+ * promises.
+ */
+import PlaceholderMedia from "./PlaceholderMedia.astro";
+import Provisional from "./Provisional.astro";
+import { festival } from "../content/home.ts";
+import type { FeatureBlock, SectionSurface } from "../content/types.ts";
+
+interface Props {
+  content?: FeatureBlock;
+  surface?: SectionSurface;
+  id?: string;
+}
+
+const {
+  content = festival,
+  surface = "dark",
+  id = "festival",
+}: Props = Astro.props;
+
+const titleId = `${id}-title`;
+---
+
+<section
+  class:list={["festival", "section", `section--${surface}`]}
+  aria-labelledby={titleId}
+>
+  <div class="container">
+    <div class="festival__grid">
+      <div class="festival__text">
+        <p class="eyebrow">{content.eyebrow}</p>
+        <h2 class="section__title" id={titleId}>{content.title}</h2>
+        <p class="measure">{content.body}</p>
+        {
+          content.details && (
+            <p class="festival__note">
+              <Provisional value={content.details} />
+            </p>
+          )
+        }
+      </div>
+
+      <div class="festival__media">
+        {
+          content.image ? (
+            <img
+              src={content.image}
+              alt={content.imageAlt}
+              width="960"
+              height="720"
+              loading="lazy"
+              decoding="async"
+            />
+          ) : (
+            <PlaceholderMedia
+              label="Festival / finish-line photography"
+              intendedAlt={content.imageAlt}
+              ratio="4 / 3"
+            />
+          )
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .festival__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-6) var(--space-8);
+    align-items: center;
+  }
+
+  .festival__text {
+    display: grid;
+    gap: var(--space-4);
+    align-content: start;
+  }
+
+  .festival__text p {
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--text-on-dark-muted);
+  }
+
+  .festival__note {
+    font-size: var(--text-sm);
+  }
+
+  .festival__media img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-md);
+  }
+
+  @media (max-width: 52rem) {
+    .festival__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

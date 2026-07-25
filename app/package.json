@@ -1,0 +1,27 @@
+{
+  "name": "fort-lauderdale-13-1",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "npm run audit && astro build",
+    "build:production": "npm run audit:release && astro build",
+    "preview": "astro preview",
+    "audit": "node scripts/content-audit.ts",
+    "audit:release": "node scripts/content-audit.ts --release",
+    "check": "astro check",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^7.1.3"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "@types/node": "^26.1.1",
+    "typescript": "^6.0.3"
+  }
+}

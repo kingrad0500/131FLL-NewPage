@@ -1,0 +1,160 @@
+---
+/**
+ * SponsorShowcase — tiered partner presentation.
+ *
+ * Only sponsors with a production-ready asset render. AGENTS.md forbids
+ * missing-image labels and empty frames, so a sponsor whose file is unusable
+ * is omitted entirely rather than shown degraded — see the withheld list in
+ * agents/asset-manifest.md and DEC-006.
+ *
+ * Tiers themselves are unverified (DEC-006): the event lockup says Baptist
+ * Health is "Presented by", while the specification tiers them as medical
+ * partner. A build-time notice states this rather than hiding it.
+ *
+ * The supporting marquee is deferred to Phase 9; a static grid is the
+ * baseline and also the permanent reduced-motion presentation.
+ */
+import { publishableTiers, withheldSponsors } from "../content/sponsors.ts";
+import type { SectionSurface } from "../content/types.ts";
+
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  surface?: SectionSurface;
+  id?: string;
+}
+
+const {
+  eyebrow = "Partners",
+  title = "The race runs on their support",
+  surface = "light",
+  id = "sponsors",
+}: Props = Astro.props;
+
+const titleId = `${id}-title`;
+---
+
+<section
+  class:list={["sponsors", "section", `section--${surface}`]}
+  aria-labelledby={titleId}
+>
+  <div class="container">
+    <p class="eyebrow">{eyebrow}</p>
+    <h2 class="section__title sponsors__title" id={titleId}>{title}</h2>
+
+    {
+      publishableTiers.map((tier) => (
+        <div class="tier">
+          <h3 class="tier__label eyebrow">{tier.label}</h3>
+          <ul class:list={["tier__logos", `tier__logos--${tier.size}`]} role="list">
+            {tier.sponsors.map((sponsor) => (
+              <li class="tier__item">
+                <img
+                  src={sponsor.logo!}
+                  alt={sponsor.alt}
+                  width={sponsor.logoWidth}
+                  height={sponsor.logoHeight}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+
+    {
+      withheldSponsors.length > 0 && (
+        <aside class="sponsors__withheld" role="note">
+          <p class="sponsors__withheld-title">
+            {withheldSponsors.length} partner
+            {withheldSponsors.length === 1 ? "" : "s"} not shown — asset not
+            production-ready
+          </p>
+          <ul role="list">
+            {withheldSponsors.map((sponsor) => (
+              <li>
+                <strong>{sponsor.name}</strong> — {sponsor.assetNote}
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .sponsors__title {
+    font-size: var(--text-3xl);
+    margin-block: var(--space-2) var(--space-8);
+  }
+
+  .tier + .tier {
+    margin-block-start: var(--space-8);
+  }
+
+  .tier__label {
+    font-size: var(--text-2xs);
+    color: var(--text-secondary);
+    padding-block-end: var(--space-3);
+    border-block-end: var(--border-width) solid var(--border-subtle);
+    margin-block-end: var(--space-5);
+  }
+
+  .tier__logos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-6) var(--space-8);
+  }
+
+  /*
+   * Optical height normalization: logos share a max height and keep their own
+   * aspect ratio, so none is stretched to a common box.
+   */
+  .tier__logos--lg .tier__item img {
+    max-height: 4.5rem;
+  }
+
+  .tier__logos--sm .tier__item img {
+    max-height: 2.75rem;
+  }
+
+  .tier__item img {
+    width: auto;
+    max-width: 14rem;
+    height: auto;
+    object-fit: contain;
+  }
+
+  .sponsors__withheld {
+    margin-block-start: var(--space-8);
+    padding: var(--space-4) var(--space-5);
+    border: var(--border-width) dashed var(--coral-500);
+    border-radius: var(--radius-md);
+    background-color: var(--surface-provisional);
+  }
+
+  .sponsors__withheld-title {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--accent-festival);
+    margin-block-end: var(--space-2);
+  }
+
+  .sponsors__withheld ul {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .sponsors__withheld li {
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--text-secondary);
+  }
+</style>

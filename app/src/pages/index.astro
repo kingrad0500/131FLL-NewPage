@@ -1,0 +1,37 @@
+---
+/**
+ * Homepage.
+ *
+ * Section order is the non-negotiable sequence from AGENTS.md:
+ * ticker → overlay header → hero → countdown → editorial → story → distances
+ * → festival → conversion → sponsors → footer.
+ *
+ * Ticker, header, and footer come from AppShell.
+ */
+import AppShell from "../layouts/AppShell.astro";
+import MediaHero from "../components/MediaHero.astro";
+import RaceCountdown from "../components/RaceCountdown.astro";
+import EditorialIntro from "../components/EditorialIntro.astro";
+import StoryScroller from "../components/StoryScroller.astro";
+import DistanceRail from "../components/DistanceRail.astro";
+import FestivalHighlight from "../components/FestivalHighlight.astro";
+import ConversionBand from "../components/ConversionBand.astro";
+import SponsorShowcase from "../components/SponsorShowcase.astro";
+import { homeHero } from "../content/home.ts";
+---
+
+<AppShell
+  title="Fort Lauderdale 13.1 — Run the Coast"
+  description="A half marathon, relay, 10K, and 5K along the Fort Lauderdale oceanfront. Sunrise start, beachfront finish, and a running festival to follow."
+  headerVariant="overlay"
+  showLoader
+>
+  <MediaHero hero={homeHero} />
+  <RaceCountdown />
+  <EditorialIntro />
+  <StoryScroller />
+  <DistanceRail />
+  <FestivalHighlight />
+  <ConversionBand />
+  <SponsorShowcase />
+</AppShell>

@@ -1,0 +1,308 @@
+---
+/**
+ * SiteHeader — transparent over the homepage hero, solid everywhere else.
+ *
+ * Owns the menu trigger and the full-screen menu's behavior: focus trap,
+ * Escape to close, scroll lock, and focus restoration to the trigger.
+ */
+import FullScreenMenu from "./FullScreenMenu.astro";
+import BrandLockup from "./BrandLockup.astro";
+import CTAGroup from "./CTAGroup.astro";
+import { registerAction } from "../content/event.ts";
+
+interface Props {
+  /** Overlay sits transparent above a hero; solid starts opaque. */
+  variant?: "overlay" | "solid";
+}
+
+const { variant = "solid" }: Props = Astro.props;
+
+/** Compact label in the header; same destination as everywhere else. */
+const headerRegister = [{ ...registerAction, label: "Register" }];
+---
+
+<header class:list={["header", `header--${variant}`]} data-header>
+  <div class="header__inner container">
+    <BrandLockup theme="dark" />
+
+    <div class="header__actions">
+      <CTAGroup actions={headerRegister} class="header__register" />
+
+      <button
+        class="header__menu-trigger"
+        type="button"
+        data-menu-trigger
+        aria-expanded="false"
+        aria-controls="site-menu"
+      >
+        <span class="header__menu-label" data-menu-label>Menu</span>
+        <span class="header__menu-icon" aria-hidden="true">
+          <span></span><span></span>
+        </span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<FullScreenMenu />
+
+<style>
+  /* Positioning belongs to .topbar in AppShell; this only paints. */
+  .header {
+    transition:
+      background-color var(--duration-micro) var(--ease-standard),
+      box-shadow var(--duration-micro) var(--ease-standard);
+  }
+
+  .header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    min-height: var(--header-height);
+  }
+
+  .header__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  /* Compact button sizing for the header only. */
+  .header__register :global(.btn) {
+    min-height: 2.5rem;
+    padding: var(--space-2) var(--space-5);
+    font-size: var(--text-xs);
+  }
+
+  .header__menu-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: var(--touch-target);
+    min-width: var(--touch-target);
+    padding: var(--space-2) var(--space-5);
+    background-color: transparent;
+    border: var(--border-width-thick) solid currentColor;
+    border-radius: var(--radius-pill);
+    color: var(--navy-950);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+    cursor: pointer;
+    transition:
+      background-color var(--duration-micro) var(--ease-standard),
+      color var(--duration-micro) var(--ease-standard);
+  }
+
+  .header__menu-icon {
+    display: grid;
+    gap: 4px;
+    width: 18px;
+  }
+
+  .header__menu-icon span {
+    display: block;
+    height: 2px;
+    background-color: currentColor;
+    transition: transform var(--duration-micro) var(--ease-standard);
+  }
+
+  /* --- Overlay variant: transparent over the hero ------------------- */
+
+  .header--overlay {
+    background-color: transparent;
+  }
+
+  .header--overlay .header__menu-trigger {
+    color: var(--white);
+  }
+
+  /* --- Solid / scrolled state --------------------------------------- */
+
+  .header--solid,
+  .header.is-scrolled {
+    background-color: var(--navy-950);
+    box-shadow: var(--shadow-md);
+  }
+
+  .header--solid .header__menu-trigger,
+  .header.is-scrolled .header__menu-trigger {
+    color: var(--white);
+  }
+
+  .header__menu-trigger:hover {
+    background-color: rgba(255, 255, 255, 0.14);
+  }
+
+  /* --- Open state ---------------------------------------------------- */
+
+  .header.is-menu-open {
+    background-color: transparent;
+    box-shadow: none;
+  }
+
+  .header.is-menu-open .header__menu-icon span:first-child {
+    transform: translateY(3px) rotate(45deg);
+  }
+
+  .header.is-menu-open .header__menu-icon span:last-child {
+    transform: translateY(-3px) rotate(-45deg);
+  }
+
+  @media (max-width: 40rem) {
+    .header__register {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  const header = document.querySelector<HTMLElement>("[data-header]");
+  const trigger = document.querySelector<HTMLButtonElement>("[data-menu-trigger]");
+  const label = document.querySelector<HTMLElement>("[data-menu-label]");
+  const menu = document.querySelector<HTMLElement>("[data-menu]");
+
+  if (header && trigger && menu && label) {
+    const FOCUSABLE =
+      'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
+    let isOpen = false;
+    let scrollY = 0;
+    /*
+     * Cached while the menu is open. The set cannot change during that time,
+     * and rebuilding it per Tab press costs a querySelectorAll plus one
+     * layout-forcing offsetParent read per match.
+     */
+    let focusables: HTMLElement[] = [];
+
+    const collectFocusables = () =>
+      Array.from(menu.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
+        (el) => el.offsetParent !== null,
+      );
+
+    const onKeydown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        close();
+        return;
+      }
+
+      if (e.key !== "Tab") return;
+
+      // Trap: the trigger stays in the cycle so it can be tabbed back to.
+      const items = [trigger, ...focusables];
+      if (items.length === 0) return;
+
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement;
+
+      if (e.shiftKey && active === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    const open = () => {
+      if (isOpen) return;
+      isOpen = true;
+
+      scrollY = window.scrollY;
+      menu.hidden = false;
+      // Next frame so the transition runs from the hidden state.
+      requestAnimationFrame(() => menu.classList.add("is-open"));
+
+      header.classList.add("is-menu-open");
+      trigger.setAttribute("aria-expanded", "true");
+      label.textContent = "Close";
+
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = "100%";
+
+      document.addEventListener("keydown", onKeydown);
+      focusables = collectFocusables();
+      focusables[0]?.focus();
+    };
+
+    const close = () => {
+      if (!isOpen) return;
+      isOpen = false;
+
+      menu.classList.remove("is-open");
+      header.classList.remove("is-menu-open");
+      trigger.setAttribute("aria-expanded", "false");
+      label.textContent = "Menu";
+
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+      window.scrollTo(0, scrollY);
+
+      document.removeEventListener("keydown", onKeydown);
+      focusables = [];
+
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.setTimeout(
+        () => {
+          if (!isOpen) menu.hidden = true;
+        },
+        reduced ? 10 : 420,
+      );
+
+      // Focus returns to the control that opened the menu.
+      trigger.focus();
+    };
+
+    trigger.addEventListener("click", () => (isOpen ? close() : open()));
+
+    // Following a link should not leave the body scroll-locked.
+    menu.addEventListener("click", (e) => {
+      if ((e.target as HTMLElement).closest("a[href]")) close();
+    });
+
+    // Header switches to its solid state once the hero has scrolled past.
+    if (header.classList.contains("header--overlay")) {
+      const sentinel = document.querySelector<HTMLElement>(
+        "[data-header-sentinel]",
+      );
+
+      if (sentinel) {
+        // The whole topbar overlays the hero, not just the header, so the
+        // flip must clear the ticker too. Cached — it only changes on resize.
+        const topbar = header.closest<HTMLElement>(".topbar") ?? header;
+        let topbarHeight = topbar.offsetHeight;
+        let ticking = false;
+        let isSolid: boolean | null = null;
+
+        const syncHeaderTheme = () => {
+          ticking = false;
+          // The sentinel sits at the hero's end; flip once it reaches the
+          // underside of the topbar.
+          const solid = sentinel.getBoundingClientRect().top <= topbarHeight;
+          if (solid === isSolid) return;
+          isSolid = solid;
+          header.classList.toggle("is-scrolled", solid);
+        };
+
+        const requestSync = () => {
+          if (ticking) return;
+          ticking = true;
+          requestAnimationFrame(syncHeaderTheme);
+        };
+
+        window.addEventListener("scroll", requestSync, { passive: true });
+        window.addEventListener("resize", () => {
+          topbarHeight = topbar.offsetHeight;
+          requestSync();
+        });
+        syncHeaderTheme();
+      }
+    }
+  }
+</script>

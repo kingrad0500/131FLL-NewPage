@@ -1,0 +1,83 @@
+---
+/**
+ * BrandLockup — event identity, theme-aware.
+ *
+ * The supplied lockup (assets/brand/fort-lauderdale-13-1-logo.png) is a
+ * full-color mark: navy shield, yellow sun, navy wordmark, Baptist Health
+ * endorsement. On dark surfaces it is invisible, and knocking it out with
+ * `brightness(0) invert(1)` collapses the shield, sun, and fine endorsement
+ * type into an illegible white silhouette.
+ *
+ * Until a reversed/white lockup is supplied (DEC-010), dark surfaces use the
+ * 13.1 mark, which is a clean single-color silhouette that inverts correctly.
+ * Both variants carry the same accessible name, so the event is identified
+ * either way.
+ */
+
+interface Props {
+  /** Surface the lockup sits on. */
+  theme?: "light" | "dark";
+  /** Renders as a link to home unless false. */
+  href?: string | false;
+  /** Below-the-fold instances should defer. */
+  loading?: "eager" | "lazy";
+  class?: string;
+}
+
+const {
+  theme = "light",
+  href = "/",
+  loading = "eager",
+  class: className,
+}: Props = Astro.props;
+
+const label = "Fort Lauderdale 13.1";
+const isLink = href !== false;
+
+const Wrapper = isLink ? "a" : "span";
+const wrapperProps = isLink ? { href, class: "u-unstyled-link" } : {};
+
+const art =
+  theme === "dark"
+    ? {
+        class: "lockup__mark",
+        src: "/assets/brand/fort-lauderdale-13-1-loader.png",
+        width: 400,
+        height: 400,
+      }
+    : {
+        class: "lockup__full",
+        src: "/assets/brand/fort-lauderdale-13-1-logo.png",
+        width: 322,
+        height: 132,
+      };
+---
+
+<Wrapper {...wrapperProps} class:list={["lockup", className]}>
+  <img
+    {...art}
+    alt={isLink ? `${label} — home` : label}
+    loading={loading}
+    decoding="async"
+  />
+</Wrapper>
+
+<style>
+  .lockup {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .lockup__full {
+    height: var(--lockup-height, clamp(2.5rem, 4.5vw, 3.25rem));
+    width: auto;
+  }
+
+  .lockup__mark {
+    height: var(--lockup-mark-height, clamp(2.25rem, 3.5vw, 2.75rem));
+    width: auto;
+    /* Single-colour silhouette — inverts cleanly to white. */
+    filter: brightness(0) invert(1);
+  }
+</style>

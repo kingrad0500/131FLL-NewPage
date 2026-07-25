@@ -1,0 +1,146 @@
+---
+/**
+ * FullScreenMenu — grouped navigation overlay.
+ *
+ * Accessibility contract (AGENTS.md, Navigation system):
+ *   · Full viewport, large readable links, ~420ms reveal.
+ *   · Escape closes.
+ *   · Focus is trapped while open and returns to the trigger on close.
+ *   · Background page cannot scroll while open.
+ *   · Current route is identified with aria-current.
+ *   · Register is visually dominant.
+ *
+ * Only MVP routes render (DEC-001) so the menu never links to an empty page.
+ */
+import CTAGroup from "./CTAGroup.astro";
+import { releaseNavigation } from "../content/navigation.ts";
+import { registerAction } from "../content/event.ts";
+
+const currentPath = Astro.url.pathname;
+---
+
+<div class="menu" id="site-menu" data-menu hidden>
+  <div class="menu__inner container">
+    <nav class="menu__nav" aria-label="Main">
+      <ul class="menu__groups" role="list">
+        {
+          releaseNavigation.map((group) => (
+            <li class="menu__group">
+              <h2 class="eyebrow menu__group-label">{group.label}</h2>
+              <ul class="menu__links" role="list">
+                {group.links.map((link) => (
+                  <li>
+                    <a
+                      class="menu__link u-unstyled-link"
+                      href={link.href}
+                      aria-current={
+                        currentPath === link.href ? "page" : undefined
+                      }
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="menu__cta">
+      <CTAGroup actions={[registerAction]} />
+    </div>
+  </div>
+</div>
+
+<style>
+  .menu {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-menu);
+    background-color: var(--navy-950);
+    color: var(--text-on-dark);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    opacity: 0;
+    transform: translateY(-1.5rem);
+    transition:
+      opacity var(--duration-menu) var(--ease-menu),
+      transform var(--duration-menu) var(--ease-menu);
+  }
+
+  .menu[hidden] {
+    display: none;
+  }
+
+  .menu.is-open {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .menu__inner {
+    display: grid;
+    gap: var(--space-8);
+    min-height: 100svh;
+    align-content: center;
+    padding-block: clamp(6rem, 12vh, 9rem) var(--space-8);
+  }
+
+  .menu__groups {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: var(--space-7) var(--space-6);
+  }
+
+  .menu__group-label {
+    color: var(--aqua-300);
+    margin-block-end: var(--space-3);
+  }
+
+  .menu__links {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .menu__link {
+    display: inline-block;
+    padding-block: var(--space-2);
+    min-height: var(--touch-target);
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-tight);
+    color: var(--text-on-dark);
+    transition: color var(--duration-micro) var(--ease-standard);
+  }
+
+  .menu__link:hover {
+    color: var(--yellow-500);
+  }
+
+  .menu__link[aria-current="page"] {
+    color: var(--yellow-500);
+    text-decoration: underline;
+    text-underline-offset: 0.22em;
+    text-decoration-thickness: 2px;
+  }
+
+  .menu__cta {
+    border-block-start: var(--border-width) solid var(--border-on-dark);
+    padding-block-start: var(--space-6);
+  }
+
+  .menu__cta :global(.btn) {
+    font-size: var(--text-base);
+    padding-inline: var(--space-8);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .menu {
+      transform: none;
+      transition: opacity 1ms linear;
+    }
+  }
+</style>

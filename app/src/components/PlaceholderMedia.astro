@@ -1,0 +1,116 @@
+---
+/**
+ * Stands in for approved photography or video that does not exist yet.
+ *
+ * Deliberately designed rather than broken-looking: AGENTS.md forbids empty
+ * frames and missing-image labels, and a layout that only looks right once
+ * real media arrives cannot be evaluated. This holds the correct aspect ratio
+ * so the surrounding composition is reviewable today, while stating plainly
+ * that it is not real content.
+ */
+
+interface Props {
+  /** What the real asset should be. Shown on the placeholder. */
+  label: string;
+  /** Intended alt text for the eventual asset, recorded here for handoff. */
+  intendedAlt?: string;
+  ratio?: string;
+  /**
+   * Fills its container instead of holding a ratio, and anchors the notice to
+   * the top so full-bleed users (the hero) need not reach in and reposition
+   * internals. Consumers set --placeholder-inset to clear any overlay.
+   */
+  fill?: boolean;
+  class?: string;
+}
+
+const {
+  label,
+  intendedAlt,
+  ratio = "16 / 9",
+  fill = false,
+  class: className,
+}: Props = Astro.props;
+---
+
+<div
+  class:list={["placeholder", { "placeholder--fill": fill }, className]}
+  style={`--ratio: ${ratio}`}
+  role="img"
+  aria-label={`Placeholder for ${label}. No approved media supplied yet.`}
+>
+  <div class="placeholder__inner">
+    <span class="placeholder__badge">Placeholder</span>
+    <p class="placeholder__label">{label}</p>
+    {intendedAlt && <p class="placeholder__alt">Alt: “{intendedAlt}”</p>}
+  </div>
+</div>
+
+<style>
+  .placeholder {
+    position: relative;
+    aspect-ratio: var(--ratio);
+    width: 100%;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    background-color: var(--navy-950);
+    background-image:
+      repeating-linear-gradient(
+        135deg,
+        transparent 0 14px,
+        rgba(255, 255, 255, 0.035) 14px 28px
+      ),
+      linear-gradient(150deg, var(--navy-800) 0%, var(--navy-950) 70%);
+    color: var(--text-on-dark);
+  }
+
+  .placeholder--fill {
+    height: 100%;
+    aspect-ratio: auto;
+    border-radius: 0;
+    align-items: start;
+  }
+
+  .placeholder__inner {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-2);
+    padding: var(--space-5);
+    padding-block-start: calc(var(--space-5) + var(--placeholder-inset, 0px));
+    text-align: center;
+    max-width: 34ch;
+  }
+
+  .placeholder--fill .placeholder__inner {
+    opacity: 0.7;
+  }
+
+  .placeholder__badge {
+    padding: 0.25em 0.75em;
+    border: var(--border-width) dashed var(--coral-500);
+    border-radius: var(--radius-pill);
+    background-color: var(--surface-provisional);
+    color: var(--coral-500);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+  }
+
+  .placeholder__label {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-snug);
+    color: var(--text-on-dark);
+  }
+
+  .placeholder__alt {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    line-height: var(--leading-snug);
+    color: var(--text-on-dark-muted);
+  }
+</style>

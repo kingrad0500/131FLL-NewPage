@@ -1,0 +1,227 @@
+---
+/**
+ * BrandLoader — the yellow 13.1 opening beat (AGENTS.md, Signature loading
+ * experience).
+ *
+ * Props are the single source of timing and colour: they are written to the
+ * element as inline custom properties (read by CSS) and data attributes (read
+ * by the script), so the two can never disagree. This also gives tests a seam
+ * to drive the timeout, cached-media, reduced-motion, and session cases.
+ *
+ * Behavior contract:
+ *   · Minimum hold so a cached load does not flash.
+ *   · Target hold on a normal load; hard ceiling regardless of media state.
+ *   · Once per browser session.
+ *   · Reduced motion: brief hold, then a short crossfade — no wipe or scale.
+ *   · If JavaScript never runs, the loader is never shown, because the markup
+ *     is inert until the script reveals it. Content is always reachable.
+ *   · Never traps the accessibility tree: aria-hidden throughout, page not
+ *     inert.
+ */
+
+interface Props {
+  mark?: string;
+  markAlt?: string;
+  backgroundColor?: string;
+  foregroundColor?: string;
+  minimumDuration?: number;
+  targetDuration?: number;
+  maximumDuration?: number;
+  showOncePerSession?: boolean;
+  /** Session-storage key; distinct values let tests isolate runs. */
+  sessionKey?: string;
+}
+
+const {
+  mark = "/assets/brand/fort-lauderdale-13-1-loader.png",
+  markAlt = "",
+  backgroundColor = "var(--yellow-500)",
+  foregroundColor = "var(--ink-950)",
+  minimumDuration = 600,
+  targetDuration = 1200,
+  maximumDuration = 2000,
+  showOncePerSession = true,
+  sessionKey = "fll131:loader-shown",
+}: Props = Astro.props;
+---
+
+<div
+  class="loader"
+  data-brand-loader
+  data-min={minimumDuration}
+  data-target={targetDuration}
+  data-max={maximumDuration}
+  data-once={showOncePerSession ? "true" : "false"}
+  data-session-key={sessionKey}
+  style={`--loader-bg: ${backgroundColor}; --loader-fg: ${foregroundColor}; --loader-target: ${targetDuration}ms;`}
+  hidden
+  aria-hidden="true"
+>
+  <div class="loader__mark">
+    <img src={mark} alt={markAlt} width="400" height="400" decoding="async" />
+  </div>
+  <div class="loader__progress"><span class="loader__bar"></span></div>
+</div>
+
+<style>
+  .loader {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-loader);
+    display: grid;
+    place-content: center;
+    gap: var(--space-6);
+    background-color: var(--loader-bg);
+    transform: translateY(0);
+    transition:
+      transform var(--duration-menu) var(--ease-menu),
+      opacity var(--duration-micro) var(--ease-standard);
+  }
+
+  .loader[hidden] {
+    display: none;
+  }
+
+  .loader__mark {
+    width: min(38vw, 20rem);
+    animation: loader-mark 900ms var(--ease-emphasized) both;
+  }
+
+  .loader__mark img {
+    width: 100%;
+    height: auto;
+  }
+
+  .loader__progress {
+    justify-self: center;
+    width: min(30vw, 12rem);
+    height: 3px;
+    background-color: color-mix(in srgb, var(--loader-fg) 18%, transparent);
+    overflow: hidden;
+  }
+
+  .loader__bar {
+    display: block;
+    height: 100%;
+    width: 100%;
+    background-color: var(--loader-fg);
+    transform-origin: left center;
+    transform: scaleX(0);
+    animation: loader-bar var(--loader-target) var(--ease-standard) both;
+  }
+
+  /* Exit — panel lifts away and the hero is already behind it. */
+  .loader.is-leaving {
+    transform: translateY(-100%);
+  }
+
+  @keyframes loader-mark {
+    from {
+      opacity: 0;
+      transform: scale(0.92);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes loader-bar {
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .loader__mark,
+    .loader__bar {
+      animation: none;
+    }
+
+    .loader__bar {
+      transform: scaleX(1);
+    }
+
+    .loader {
+      transition: opacity 200ms linear;
+    }
+
+    /* Crossfade instead of a wipe. */
+    .loader.is-leaving {
+      transform: none;
+      opacity: 0;
+    }
+  }
+</style>
+
+<script>
+  const loader = document.querySelector<HTMLElement>("[data-brand-loader]");
+
+  if (loader) {
+    const minDuration = Number(loader.dataset.min ?? 600);
+    const targetDuration = Number(loader.dataset.target ?? 1200);
+    const maxDuration = Number(loader.dataset.max ?? 2000);
+    const oncePerSession = loader.dataset.once !== "false";
+    const sessionKey = loader.dataset.sessionKey ?? "fll131:loader-shown";
+
+    let alreadyShown = false;
+    if (oncePerSession) {
+      try {
+        alreadyShown = sessionStorage.getItem(sessionKey) === "1";
+      } catch {
+        // Private mode or blocked storage — show the loader, do not fail.
+      }
+    }
+
+    if (!alreadyShown) {
+      const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+
+      loader.hidden = false;
+      document.documentElement.style.overflow = "hidden";
+
+      if (oncePerSession) {
+        try {
+          sessionStorage.setItem(sessionKey, "1");
+        } catch {
+          /* non-fatal */
+        }
+      }
+
+      let finished = false;
+
+      const finish = () => {
+        if (finished) return;
+        finished = true;
+
+        loader.classList.add("is-leaving");
+        document.documentElement.style.overflow = "";
+
+        window.setTimeout(
+          () => {
+            loader.hidden = true;
+            loader.dispatchEvent(
+              new CustomEvent("brandloader:complete", { bubbles: true }),
+            );
+          },
+          reducedMotion ? 250 : 480,
+        );
+      };
+
+      // Reduced motion gets the shortest acceptable hold; everything else
+      // gets the target. Either way the ceiling below wins if load stalls.
+      const hold = reducedMotion ? minDuration : targetDuration;
+      const holdThenFinish = () => window.setTimeout(finish, hold);
+
+      if (document.readyState === "complete") {
+        holdThenFinish();
+      } else {
+        window.addEventListener("load", holdThenFinish, { once: true });
+      }
+
+      // Hard ceiling — decorative reasons never hold the user.
+      window.setTimeout(finish, maxDuration);
+    }
+  }
+</script>

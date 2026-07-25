@@ -1,0 +1,78 @@
+---
+/**
+ * Renders a CTA set with explicit priority. AGENTS.md requires clear CTA
+ * hierarchy — not every action should look primary.
+ *
+ * A CTA whose href is still [TBD] renders as a disabled control rather than a
+ * link. Shipping an anchor pointing at "[TBD] Registration provider URL" would
+ * be a broken link presented as a working one. This is the only place that
+ * decision is made; header, menu, and footer all route through here.
+ */
+import { isTBD, stripTBD } from "../lib/placeholder.ts";
+import type { CTA } from "../content/types.ts";
+
+interface Props {
+  actions: CTA[];
+  class?: string;
+}
+
+const { actions, class: className }: Props = Astro.props;
+
+const VARIANTS: Record<CTA["priority"], string> = {
+  primary: "btn--primary",
+  secondary: "btn--secondary",
+  tertiary: "btn--tertiary",
+};
+---
+
+<div class:list={["cta-group", className]}>
+  {
+    actions.map((action) => {
+      const variant = VARIANTS[action.priority];
+
+      if (isTBD(action.href)) {
+        return (
+          <span
+            class:list={["btn", variant, "btn--unresolved"]}
+            role="link"
+            aria-disabled="true"
+            title={`Destination not yet confirmed: ${stripTBD(action.href)}`}
+          >
+            {action.label}
+            <span class="btn__tbd">TBD</span>
+          </span>
+        );
+      }
+
+      return (
+        <a
+          class:list={["btn", variant, "u-unstyled-link"]}
+          href={action.href}
+          {...(action.external
+            ? { target: "_blank", rel: "noopener noreferrer" }
+            : {})}
+        >
+          {action.label}
+          {action.external && (
+            <span class="visually-hidden">(opens in a new tab)</span>
+          )}
+        </a>
+      );
+    })
+  }
+</div>
+
+<style>
+  .cta-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  @media (max-width: 34rem) {
+    .cta-group {
+      flex-direction: column;
+    }
+  }
+</style>
