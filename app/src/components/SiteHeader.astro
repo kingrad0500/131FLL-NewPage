@@ -49,6 +49,13 @@ const headerRegister = [{ ...registerAction, label: "Register" }];
 <style>
   /* Positioning belongs to .topbar in AppShell; this only paints. */
   .header {
+    /*
+     * The full-screen menu renders as a sibling inside the same fixed topbar
+     * and stacks at --z-menu. The header must sit above it, or the open
+     * overlay buries the trigger and the menu cannot be closed by pointer.
+     */
+    position: relative;
+    z-index: calc(var(--z-menu) + 1);
     transition:
       background-color var(--duration-micro) var(--ease-standard),
       box-shadow var(--duration-micro) var(--ease-standard);
