@@ -46,7 +46,26 @@ test("the preview build contains every MVP route with one h1", async () => {
       1,
       `${route} must contain exactly one h1`,
     );
+    assert.match(
+      html,
+      /<meta name="robots" content="noindex, nofollow">/,
+      `${route} preview output must be noindex`,
+    );
   }
+});
+
+test("preview crawler controls fail closed", async () => {
+  const robots = await readFile(new URL("robots.txt", distRoot), "utf8");
+  const sitemap = await readFile(new URL("sitemap.xml", distRoot), "utf8");
+  assert.match(robots, /Disallow: \//);
+  assert.doesNotMatch(robots, /Allow: \//);
+  assert.doesNotMatch(sitemap, /<url>/);
+});
+
+test("the build includes a branded 404 page", async () => {
+  const html = await readFile(new URL("404.html", distRoot), "utf8");
+  assert.match(html, /<h1\b[^>]*>That route missed the turn\.<\/h1>/);
+  assert.match(html, /href="\/"/);
 });
 
 test("every local image in generated HTML exists in dist", async () => {

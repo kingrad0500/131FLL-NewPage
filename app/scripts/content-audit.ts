@@ -20,6 +20,24 @@ import { withheldSponsors } from "../src/content/sponsors.ts";
 import { inspectSourcePolicy } from "./source-policy.ts";
 
 const isRelease = process.argv.includes("--release");
+const allowIndexing = process.env.PUBLIC_ALLOW_INDEXING === "true";
+const siteUrl = process.env.PUBLIC_SITE_URL;
+const launchConfiguration: string[] = [];
+
+if (isRelease) {
+  if (!allowIndexing) {
+    launchConfiguration.push(
+      "PUBLIC_ALLOW_INDEXING must be exactly true for a production release.",
+    );
+  }
+  try {
+    if (!siteUrl || new URL(siteUrl).protocol !== "https:") throw new Error();
+  } catch {
+    launchConfiguration.push(
+      "PUBLIC_SITE_URL must be a valid HTTPS production origin.",
+    );
+  }
+}
 
 /*
  * Content modules are discovered rather than listed. The provisional registry
@@ -128,6 +146,13 @@ if (releasePlaceholders.length > 0) {
   }
 }
 
+if (launchConfiguration.length > 0) {
+  console.log(
+    `\n${red(bold(`✗ ${launchConfiguration.length} production environment requirements`))}`,
+  );
+  for (const issue of launchConfiguration) console.log(`    · ${issue}`);
+}
+
 if (strayPaths.length > 0) {
   console.log(
     `\n${dim(bold(`Content paths carrying a [TBD] value (${strayPaths.length})`))}`,
@@ -141,7 +166,8 @@ const blocking =
   generated.length +
   withheldSponsors.length +
   misplacedMarkers.length +
-  releasePlaceholders.length;
+  releasePlaceholders.length +
+  launchConfiguration.length;
 
 if (blocking === 0) {
   console.log(`\n${green(bold("✓ No unresolved content. Clear for release."))}\n`);
@@ -149,7 +175,7 @@ if (blocking === 0) {
 }
 
 console.log(
-  `\n${bold("Summary:")} ${tbd.length} unresolved · ${unconfirmed.length} unverified · ${generated.length} generated · ${withheldSponsors.length} sponsors withheld · ${misplacedMarkers.length} misplaced markers · ${releasePlaceholders.length} media placeholders`,
+  `\n${bold("Summary:")} ${tbd.length} unresolved · ${unconfirmed.length} unverified · ${generated.length} generated · ${withheldSponsors.length} sponsors withheld · ${misplacedMarkers.length} misplaced markers · ${releasePlaceholders.length} media placeholders · ${launchConfiguration.length} launch configuration`,
 );
 
 if (isRelease) {

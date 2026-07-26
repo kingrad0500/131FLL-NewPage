@@ -26,6 +26,16 @@ const {
   headerVariant = "solid",
   showLoader = false,
 } = Astro.props;
+
+/*
+ * Preview deployments fail closed for search indexing. The public launch must
+ * explicitly set both variables in the production environment.
+ */
+const allowIndexing = import.meta.env.PUBLIC_ALLOW_INDEXING === "true";
+const configuredSiteUrl = import.meta.env.PUBLIC_SITE_URL;
+const canonicalUrl = configuredSiteUrl
+  ? new URL(Astro.url.pathname, configuredSiteUrl).href
+  : undefined;
 ---
 
 <!doctype html>
@@ -35,11 +45,17 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta
+      name="robots"
+      content={allowIndexing ? "index, follow" : "noindex, nofollow"}
+    />
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
     <meta name="generator" content={Astro.generator} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
     <meta name="theme-color" content="#002B5C" />
   </head>
 
