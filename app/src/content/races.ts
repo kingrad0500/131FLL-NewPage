@@ -16,6 +16,11 @@ import type { RacePage } from "./types.ts";
 
 const START_FINISH = "Las Olas & A1A — Las Olas Oceanside Park";
 
+export const raceOverviewHeroImage = GENERATED(
+  "/assets/heroes/interior-race.avif",
+  "Interior hero — Race overview",
+);
+
 const courseMap = (alt: string) => ({
   src: "/assets/maps/course-map.avif",
   alt,

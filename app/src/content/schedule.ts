@@ -1,4 +1,9 @@
-import { TBD } from "../lib/placeholder.ts";
+import { GENERATED, TBD } from "../lib/placeholder.ts";
+
+export const scheduleHeroImage = GENERATED(
+  "/assets/heroes/interior-schedule.avif",
+  "Interior hero — Race schedule",
+);
 import type { PickupWindow, ScheduleEntry } from "./types.ts";
 
 /**

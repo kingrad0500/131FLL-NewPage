@@ -6,15 +6,12 @@ import AppShell from "../../layouts/AppShell.astro";
 import InteriorHero from "../../components/InteriorHero.astro";
 import CTAGroup from "../../components/CTAGroup.astro";
 import Provisional from "../../components/Provisional.astro";
-import { racePages } from "../../content/races.ts";
-import { GENERATED } from "../../lib/placeholder.ts";
+import {
+  raceOverviewHeroImage,
+  racePages,
+} from "../../content/races.ts";
 import { registerAction } from "../../content/event.ts";
 import { distances } from "../../content/distances.ts";
-
-const heroImage = GENERATED(
-  "/assets/heroes/interior-race.avif",
-  "Interior hero — Race overview",
-);
 
 /** Pair each distance page with its start time and price from the rail data. */
 const cards = racePages.map((page) => {
@@ -38,7 +35,7 @@ const cards = racePages.map((page) => {
     eyebrow="The Race"
     title="Four distances, one finish line"
     subtitle="Whichever one you pick, it ends on the beach."
-    image={heroImage}
+    image={raceOverviewHeroImage}
   />
 
   <section class="section section--light" aria-labelledby="distances-title">

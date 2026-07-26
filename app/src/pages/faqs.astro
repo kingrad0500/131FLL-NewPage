@@ -6,14 +6,8 @@ import AppShell from "../layouts/AppShell.astro";
 import InteriorHero from "../components/InteriorHero.astro";
 import FaqAccordion from "../components/FaqAccordion.astro";
 import Provisional from "../components/Provisional.astro";
-import { GENERATED } from "../lib/placeholder.ts";
 import { event } from "../content/event.ts";
-import { faqGroups } from "../content/faqs.ts";
-
-const heroImage = GENERATED(
-  "/assets/heroes/interior-faqs.avif",
-  "Interior hero — FAQs and contact",
-);
+import { faqGroups, faqsHeroImage } from "../content/faqs.ts";
 ---
 
 <AppShell
@@ -25,7 +19,7 @@ const heroImage = GENERATED(
     eyebrow="Questions"
     title="FAQs"
     subtitle="Answers to what runners ask us most."
-    image={heroImage}
+    image={faqsHeroImage}
   />
 
   <section class="section section--light" aria-labelledby="faq-title">

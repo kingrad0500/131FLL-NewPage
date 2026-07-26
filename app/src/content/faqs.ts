@@ -1,4 +1,13 @@
-import { TBD } from "../lib/placeholder.ts";
+import { GENERATED, TBD } from "../lib/placeholder.ts";
+import {
+  distanceChangePolicy,
+  registrationCloseDate,
+} from "./registration.ts";
+
+export const faqsHeroImage = GENERATED(
+  "/assets/heroes/interior-faqs.avif",
+  "Interior hero — FAQs and contact",
+);
 import type { FaqGroup } from "./types.ts";
 
 /**
@@ -97,11 +106,11 @@ export const faqGroups: FaqGroup[] = [
       },
       {
         question: "Can I change distances?",
-        answer: TBD("How runners change distances under Split Second Timing"),
+        answer: distanceChangePolicy,
       },
       {
         question: "When does registration close?",
-        answer: TBD("2026 registration close date"),
+        answer: registrationCloseDate,
       },
     ],
   },

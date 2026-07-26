@@ -6,7 +6,6 @@ import AppShell from "../../layouts/AppShell.astro";
 import InteriorHero from "../../components/InteriorHero.astro";
 import Provisional from "../../components/Provisional.astro";
 import CTAGroup from "../../components/CTAGroup.astro";
-import { GENERATED } from "../../lib/placeholder.ts";
 import { registerAction } from "../../content/event.ts";
 import {
   bibRules,
@@ -16,12 +15,8 @@ import {
   pickupRules,
   raceDay,
   raceDaySchedule,
+  scheduleHeroImage,
 } from "../../content/schedule.ts";
-
-const heroImage = GENERATED(
-  "/assets/heroes/interior-schedule.avif",
-  "Interior hero — Race schedule",
-);
 ---
 
 <AppShell
@@ -33,7 +28,7 @@ const heroImage = GENERATED(
     eyebrow="Race Weekend"
     title="Schedule"
     subtitle="From packet pickup to the post-race party."
-    image={heroImage}
+    image={scheduleHeroImage}
   />
 
   <section class="section section--light" aria-labelledby="raceday-title">

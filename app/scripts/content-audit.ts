@@ -17,6 +17,7 @@ import { readdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { summarizeProvisional, findTBDPaths } from "../src/lib/placeholder.ts";
 import { withheldSponsors } from "../src/content/sponsors.ts";
+import { inspectSourcePolicy } from "./source-policy.ts";
 
 const isRelease = process.argv.includes("--release");
 
@@ -46,10 +47,18 @@ const dim = (s: string) => `\x1b[2m${s}\x1b[0m`;
 
 const { tbd, unconfirmed, generated } = summarizeProvisional();
 const strayPaths = findTBDPaths(contentTree);
+const sourceFindings = await inspectSourcePolicy();
+const misplacedMarkers = sourceFindings.filter(
+  (finding) => finding.kind === "marker-outside-content",
+);
+const releasePlaceholders = sourceFindings.filter(
+  (finding) => finding.kind === "release-placeholder",
+);
 
 console.log(`\n${bold("Fort Lauderdale 13.1 — content audit")}`);
 console.log(dim(isRelease ? "mode: release (blocking)" : "mode: advisory"));
 console.log(dim(`scanned ${moduleNames.length} content modules`));
+console.log(dim("scanned src/**/*.ts and src/**/*.astro for release-policy violations"));
 
 if (tbd.length > 0) {
   console.log(`\n${red(bold(`✗ ${tbd.length} unresolved [TBD] values`))}`);
@@ -99,6 +108,26 @@ if (withheldSponsors.length > 0) {
   }
 }
 
+if (misplacedMarkers.length > 0) {
+  console.log(
+    `\n${red(bold(`✗ ${misplacedMarkers.length} provisional markers outside audited content`))}`,
+  );
+  for (const finding of misplacedMarkers) {
+    console.log(`    · ${finding.file}:${finding.line}`);
+    console.log(`      ${dim(finding.message)}`);
+  }
+}
+
+if (releasePlaceholders.length > 0) {
+  console.log(
+    `\n${red(bold(`✗ ${releasePlaceholders.length} release-blocking media placeholders`))}`,
+  );
+  for (const finding of releasePlaceholders) {
+    console.log(`    · ${finding.file}:${finding.line}`);
+    console.log(`      ${dim(finding.message)}`);
+  }
+}
+
 if (strayPaths.length > 0) {
   console.log(
     `\n${dim(bold(`Content paths carrying a [TBD] value (${strayPaths.length})`))}`,
@@ -107,7 +136,12 @@ if (strayPaths.length > 0) {
 }
 
 const blocking =
-  tbd.length + unconfirmed.length + generated.length + withheldSponsors.length;
+  tbd.length +
+  unconfirmed.length +
+  generated.length +
+  withheldSponsors.length +
+  misplacedMarkers.length +
+  releasePlaceholders.length;
 
 if (blocking === 0) {
   console.log(`\n${green(bold("✓ No unresolved content. Clear for release."))}\n`);
@@ -115,7 +149,7 @@ if (blocking === 0) {
 }
 
 console.log(
-  `\n${bold("Summary:")} ${tbd.length} unresolved · ${unconfirmed.length} unverified · ${generated.length} generated · ${withheldSponsors.length} sponsors withheld`,
+  `\n${bold("Summary:")} ${tbd.length} unresolved · ${unconfirmed.length} unverified · ${generated.length} generated · ${withheldSponsors.length} sponsors withheld · ${misplacedMarkers.length} misplaced markers · ${releasePlaceholders.length} media placeholders`,
 );
 
 if (isRelease) {

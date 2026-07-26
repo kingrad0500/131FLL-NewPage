@@ -6,14 +6,12 @@ import AppShell from "../layouts/AppShell.astro";
 import InteriorHero from "../components/InteriorHero.astro";
 import ResultsArchive from "../components/ResultsArchive.astro";
 import CTAGroup from "../components/CTAGroup.astro";
-import { GENERATED } from "../lib/placeholder.ts";
 import { event } from "../content/event.ts";
-import { clockVsChip, resultsArchive } from "../content/results.ts";
-
-const heroImage = GENERATED(
-  "/assets/heroes/interior-results.avif",
-  "Interior hero — Results & Photos",
-);
+import {
+  clockVsChip,
+  resultsArchive,
+  resultsHeroImage,
+} from "../content/results.ts";
 ---
 
 <AppShell
@@ -25,7 +23,7 @@ const heroImage = GENERATED(
     eyebrow="Results & Photos"
     title="How your morning went"
     subtitle="Every distance, every year, and the photos to prove it."
-    image={heroImage}
+    image={resultsHeroImage}
   />
 
   <section class="section section--light" aria-labelledby="results-title">

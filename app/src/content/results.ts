@@ -1,4 +1,10 @@
+import { GENERATED } from "../lib/placeholder.ts";
 import type { ResultsYear } from "./types.ts";
+
+export const resultsHeroImage = GENERATED(
+  "/assets/heroes/interior-results.avif",
+  "Interior hero — Results & Photos",
+);
 
 /**
  * Results archive.

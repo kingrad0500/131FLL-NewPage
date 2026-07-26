@@ -21,6 +21,8 @@ interface Props {
    * internals. Consumers set --placeholder-inset to clear any overlay.
    */
   fill?: boolean;
+  /** Marks a guaranteed visible placeholder that must block production. */
+  releaseBlocking?: boolean;
   class?: string;
 }
 
@@ -29,6 +31,7 @@ const {
   intendedAlt,
   ratio = "16 / 9",
   fill = false,
+  releaseBlocking = false,
   class: className,
 }: Props = Astro.props;
 ---
@@ -38,6 +41,7 @@ const {
   style={`--ratio: ${ratio}`}
   role="img"
   aria-label={`Placeholder for ${label}. No approved media supplied yet.`}
+  data-release-blocking={releaseBlocking ? "" : undefined}
 >
   <div class="placeholder__inner">
     <span class="placeholder__badge">Placeholder</span>
