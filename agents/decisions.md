@@ -88,15 +88,58 @@ Use this file for product, design, content, and engineering decisions. Do not us
 
 ### DEC-006 — Sponsor tier conflict: Baptist Health
 
-- Date: 2026-07-24 · resolved 2026-07-25
+- Date: 2026-07-24 · resolved 2026-07-25 · revised 2026-07-26
 - Status: approved
 - Owner: Product owner
 - Decision or question: Is Baptist Health the *presenting* sponsor or the *official medical partner*? The two available sources disagree.
 - Options considered: Presenting / Official medical partner / Both
-- Current choice: **Both, with Baptist Health more prominent** (product owner, 2026-07-25). Tier order: "Presented by" — Baptist Health (first, largest); "Title Partner" — Liquid Youth; then Supporting Partners. The former "medical" tier id was replaced by "title" in `types.ts`/`sponsors.ts`.
-- Evidence/source: The event lockup reads "…Liquid Youth 13.1 … **Presented by** Baptist Health"; product-owner direction 2026-07-25: "Both. But put more relevance on Baptist Health."
-- Consequences: `SponsorShowcase` tier structure is final; Baptist Health leads the showcase.
+- Current choice: **One shared top tier** (product owner, 2026-07-26). Liquid Youth and Baptist Health render side by side on a single row under the combined label "Title Sponsor & Official Medical Provider" (Liquid Youth first, matching the label's order), then Supporting Partners unchanged. This supersedes the 2026-07-25 split of "Presented by" — Baptist Health above "Title Partner" — Liquid Youth. The `presenting` and `title` tier ids were collapsed into `lead` in `types.ts`/`sponsors.ts`.
+- Evidence/source: The event lockup reads "…Liquid Youth 13.1 … **Presented by** Baptist Health"; product-owner direction 2026-07-25: "Both. But put more relevance on Baptist Health." Superseded by product-owner direction 2026-07-26: put both logos on the same level under one combined label.
+- Consequences: `SponsorShowcase` renders two tiers, not three. The label was supplied as "Title Spondor & Official Medical Provider" and corrected to "Sponsor" — reconfirm if the misspelling was intentional.
 - Blocks: Nothing.
+
+### DEC-015 — Fail-closed source and build-output QA
+
+- Date: 2026-07-25
+- Status: approved
+- Owner: Engineering
+- Decision or question: How does the production gate prevent page-level
+  provisional markers and visible media placeholders from bypassing the
+  content-module registry?
+- Current choice: **Audited content boundary plus source-policy enforcement.**
+  `TBD()`, `UNCONFIRMED()`, and `GENERATED()` declarations live in
+  `src/content/`. A source scan fails the release audit when those markers
+  appear elsewhere. Guaranteed visual placeholders opt in with
+  `releaseBlocking` and are counted independently. Node regression tests cover
+  both rules. Build-output tests cover all ten routes, heading structure, local
+  image existence, absolute-path leakage, and compressed JavaScript budget.
+- Evidence/source: Production-readiness review, 2026-07-25; the prior audit
+  missed the registration deferral policy and five page-level generated heroes.
+- Consequences: The live audit changes from 21 unresolved / 22 generated to 22
+  unresolved / 27 generated, plus two hard media placeholders. Preview builds
+  remain available; production remains blocked.
+- Blocks: Nothing. Strengthens the existing DEC-008 release gate.
+
+### DEC-016 — Preview indexing and production-origin gate
+
+- Date: 2026-07-25
+- Status: approved
+- Owner: Engineering
+- Decision or question: How can client previews remain shareable without being
+  treated as the public canonical event site?
+- Current choice: **Preview-safe by default.** Unless
+  `PUBLIC_ALLOW_INDEXING=true`, every page emits `noindex, nofollow`,
+  `robots.txt` disallows all crawling, and the sitemap contains no URLs. The
+  final production environment must also provide a valid HTTPS
+  `PUBLIC_SITE_URL`; it drives canonical and Open Graph URLs, robots sitemap
+  discovery, and sitemap entries. The release audit rejects missing production
+  values.
+- Evidence/source: Hosted Vercel preflight on 2026-07-25 found the generated
+  deployment publicly accessible with no crawler controls, no robots file, and
+  no sitemap.
+- Consequences: Pushing the change makes previews safer without relying only on
+  Vercel access protection. Launch requires explicit environment configuration.
+- Blocks: Production until the final canonical domain is known and configured.
 - Challenged and reaffirmed 2026-07-25: the live site at `131fortlauderdale.com` names **Broward Health** as "Official Medical Provider" on both its homepage and sponsors page, and does not mention Baptist Health anywhere; the 2025 packet-pickup expo was Baptist-Health-branded and the Facebook slug still reads Cleveland Clinic, so the partnership has changed hands more than once. That evidence was put to the product owner, who directed: *"Baptist Health is the official and most important sponsor. What other pages said, do not follow that."* The live site is treated as out of date and the tiering above stands unchanged. Recorded here because publishing the wrong medical partner would misrepresent a commercial relationship — if this is ever revisited, start from this note.
 
 ### DEC-007 — "Running Festival" sub-brand
@@ -164,7 +207,9 @@ Use this file for product, design, content, and engineering decisions. Do not us
   - Pricing incl. sign-up fees: 13.1 $80+$7.00 · Relay $110/team+$9.03 · 10K $55+$5.31 · 5K $40+$4.30.
   - Registration `https://runsignup.com/fortlauderdale131`; results `…/Race/Results/Overview/83064`; photos `…/Race/FortLauderdale131/Page-2`.
   - Contact `info@131FortLauderdale.com` (corrected by the product owner 2026-07-25, replacing `Josh@splitsecondtiming.com`); volunteers `Lorraine@exclusivesports.com`; Facebook page (slug predates current sponsor naming — confirmed current); Instagram `wildsideonline`.
-- Open items: **Festival programming, vendors, and closing hours** — the one remaining `[TBD]` on the site.
+- Open items: 22 unresolved facts remain across registration, awards, festival
+  operations, distance logistics, relay operations, and accessibility policy.
+  The authoritative live list is `npm run audit`.
 - Evidence/source: Product-owner checklist responses, 2026-07-25.
 - Consequences: Countdown, ticker, distance rail, registration path, contact, and social links are live data. The audit's unresolved count drops from 25 to 1.
 - Blocks: Production content only via the single open item and DEC-011 media.
@@ -178,7 +223,11 @@ Use this file for product, design, content, and engineering decisions. Do not us
 - Options considered: One-off layouts per route / a shared page system approved on a representative page first.
 - Current choice: **Shared system, approved on `/race/13-1` first** (`plan.md` Phase 8). `InteriorHero` opens every route at ~52svh; `RaceDetail` renders any distance from a `RacePage` data object, so a new distance is a data file rather than a layout. `FaqAccordion` uses native `<details>`/`<summary>` with an animated disclosure and zero JavaScript; `ResultsArchive` leads with the newest year and collapses older ones.
 - Evidence/source: Product-owner approvals 2026-07-25 — legacy copy confirmed real and adaptable, `/registration` built as an informational page with entry still on RunSignup, FAQ as an accordion, results routed out to Athlinks.
-- Consequences: All nine routes exist and every menu destination resolves. Unconfirmed race logistics render as visible `[TBD]` badges (21 at build time) rather than being invented — the audit lists each one. `/registration` was added to the Race navigation group so the page is reachable.
+- Consequences: All nine interior routes exist and every menu destination
+  resolves. Unconfirmed race logistics render as visible `[TBD]` badges rather
+  than being invented; the hardened audit reports 22 unresolved facts.
+  `/registration` was added to the Race navigation group so the page is
+  reachable.
 - Fixed during the build: interior pages had no `data-header-sentinel`, so the overlay header never switched to its solid state and the white MENU control became invisible against page content once scrolled. `InteriorHero` now emits the sentinel.
 - Blocks: Nothing. Production release still blocked by the open `[TBD]` items and DEC-011 media.
 
@@ -193,7 +242,8 @@ Use this file for product, design, content, and engineering decisions. Do not us
 - Evidence/source: `assets/maps/2025-ly-fort-lauderdale-running-festival.kmz` (organizer GPS data via owner); owner approvals 2026-07-25.
 - Consequences: Course pages get honest, crisp maps. The legacy screenshot (`maps/course-screenshot-2024.png`) is reference only.
 - Open items: (1) organizer confirmation that the 2024 course line + 2025 relay exchange hold for 2026; (2) owner confirmation of per-distance derivation logic (10K = shared miles 1–6 + marked split; 5K = out-and-back at the marked turnaround; Relay = full course with exchange) before per-distance maps are produced.
-- Blocks: Per-distance maps; wiring maps into the site (course pages not yet built).
+- Blocks: Per-distance map variants and final 2026 route claims. The full-course
+  render is wired to all four distance pages with a confirmation disclaimer.
 
 ### DEC-013 — Component inspiration policy and the GalleryHero
 
@@ -208,4 +258,3 @@ Use this file for product, design, content, and engineering decisions. Do not us
 - Consequences: The homepage swaps `MediaHero` → `GalleryHero`; `MediaHero` remains for interior pages. The audit's generated count rises 13 → 17 (four staged interior-hero images now referenced). Deeply stateful widgets (comboboxes, tables, pickers) are out of scope for native recreation and require a fresh decision if ever wanted.
 - Second application 2026-07-25 — **StoryScroller sticky sequence**, adapted from the 21st.dev "scroll-01" pattern. This is the Phase 9 enhancement the component was always scaffolded for (`plan.md` step 9): on desktop a sticky media panel holds one image while the five steps scroll past, cross-fading as each reaches mid-screen. Owner-approved parameters: inactive steps dim to 45% rather than fading out, media panel left with text right, roughly three screens of scroll (measured 307svh), and only the active image exposed to assistive technology. Driven by **IntersectionObserver**, not scroll-driven CSS — "which step is centred" is a discrete question and IO is supported everywhere, so unlike the hero this needs no second code path. The plain alternating stack remains the baseline for mobile, reduced motion, and no-JavaScript, and a step still awaiting media disables the panel rather than showing gaps. Verified in Chrome and Firefox at desktop, plus mobile and reduced-motion.
 - Blocks: Nothing.
-

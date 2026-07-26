@@ -1,16 +1,28 @@
 import type { Sponsor, SponsorTier } from "./types.ts";
 
 /**
- * Tiering confirmed by the product owner 2026-07-25 (DEC-006): Baptist Health
- * and Liquid Youth are both top-tier, with Baptist Health given greater
- * prominence — "Presented by" renders first and largest, Liquid Youth follows
- * as Title Partner. Sponsor URLs confirmed the same day (DEC-004).
+ * Tiering revised by the product owner 2026-07-26: Liquid Youth and Baptist
+ * Health share one top tier rendered on a single level, under the combined
+ * label "Title Sponsor & Official Medical Provider" — Liquid Youth first to
+ * match the label's order. This supersedes the split "Presented by" / "Title
+ * Partner" rows of DEC-006. Sponsor URLs confirmed 2026-07-25 (DEC-004).
  *
  * `assetReady: false` omits a sponsor from rendering entirely. AGENTS.md
  * forbids broken images, empty frames, and missing-image labels, so a sponsor
  * with an unusable file is left out rather than shown degraded.
  */
 export const sponsors: Sponsor[] = [
+  {
+    name: "Liquid Youth",
+    logo: "/assets/partners/liquid-youth.png",
+    logoWidth: 648,
+    logoHeight: 231,
+    alt: "Liquid Youth",
+    url: "https://myliquidyouth.com/",
+    tier: "lead",
+    active: true,
+    assetReady: true,
+  },
   {
     name: "Baptist Health",
     logo: "/assets/partners/baptist-health.png",
@@ -20,18 +32,7 @@ export const sponsors: Sponsor[] = [
     logoHeight: 303,
     alt: "Baptist Health",
     url: "https://baptisthealth.net/",
-    tier: "presenting",
-    active: true,
-    assetReady: true,
-  },
-  {
-    name: "Liquid Youth",
-    logo: "/assets/partners/liquid-youth.png",
-    logoWidth: 648,
-    logoHeight: 231,
-    alt: "Liquid Youth",
-    url: "https://myliquidyouth.com/",
-    tier: "title",
+    tier: "lead",
     active: true,
     assetReady: true,
   },
@@ -79,8 +80,7 @@ export const sponsors: Sponsor[] = [
  * over it, so a new tier cannot silently fail to render.
  */
 export const sponsorTiers = [
-  { id: "presenting", label: "Presented by", size: "lg" },
-  { id: "title", label: "Title Partner", size: "lg" },
+  { id: "lead", label: "Title Sponsor & Official Medical Provider", size: "lg" },
   { id: "supporting", label: "Supporting Partners", size: "sm" },
 ] as const satisfies readonly {
   id: SponsorTier;

@@ -2,21 +2,9 @@ import assert from "node:assert/strict";
 import { access, readFile, readdir } from "node:fs/promises";
 import test from "node:test";
 import { gzipSync } from "node:zlib";
+import { MVP_ROUTES } from "../src/config/routes.ts";
 
 const distRoot = new URL("../dist/", import.meta.url);
-
-const routes = [
-  "/",
-  "/race",
-  "/race/schedule",
-  "/race/13-1",
-  "/race/relay",
-  "/race/10k",
-  "/race/5k",
-  "/registration",
-  "/results",
-  "/faqs",
-] as const;
 
 function routeFile(route: string): URL {
   return route === "/"
@@ -36,7 +24,7 @@ async function walk(directory: URL): Promise<URL[]> {
 }
 
 test("the preview build contains every MVP route with one h1", async () => {
-  for (const route of routes) {
+  for (const route of MVP_ROUTES) {
     const html = await readFile(routeFile(route), "utf8");
     assert.match(html, /<main\b/);
     assert.match(html, /<title>[^<]+<\/title>/);
@@ -69,7 +57,7 @@ test("the build includes a branded 404 page", async () => {
 });
 
 test("every local image in generated HTML exists in dist", async () => {
-  for (const route of routes) {
+  for (const route of MVP_ROUTES) {
     const html = await readFile(routeFile(route), "utf8");
     const sources = [...html.matchAll(/<(?:img|source)\b[^>]*\bsrc="(\/[^"]+)"/g)]
       .map((match) => match[1])
@@ -103,7 +91,7 @@ test("initial JavaScript remains below the 180 KB compressed budget", async () =
     ),
   );
 
-  for (const route of routes) {
+  for (const route of MVP_ROUTES) {
     const html = await readFile(routeFile(route), "utf8");
     const inlineScripts = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)]
       .map((match) => match[1] ?? "");

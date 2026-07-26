@@ -1,4 +1,5 @@
 import type { NavGroup } from "./types.ts";
+import { ROUTES } from "../config/routes.ts";
 
 /**
  * Menu structure from AGENTS.md, filtered to the MVP release (DEC-001).
@@ -11,15 +12,15 @@ export const navigation: NavGroup[] = [
   {
     label: "Race",
     links: [
-      { label: "Overview", href: "/race", inRelease: true },
-      { label: "Schedule", href: "/race/schedule", inRelease: true },
-      { label: "13.1", href: "/race/13-1", inRelease: true },
-      { label: "Relay", href: "/race/relay", inRelease: true },
-      { label: "10K", href: "/race/10k", inRelease: true },
-      { label: "5K", href: "/race/5k", inRelease: true },
+      { label: "Overview", href: ROUTES.race, inRelease: true },
+      { label: "Schedule", href: ROUTES.schedule, inRelease: true },
+      { label: "13.1", href: ROUTES.halfMarathon, inRelease: true },
+      { label: "Relay", href: ROUTES.relay, inRelease: true },
+      { label: "10K", href: ROUTES.tenK, inRelease: true },
+      { label: "5K", href: ROUTES.fiveK, inRelease: true },
       // Informational: entry itself happens on RunSignup, but the eligibility
       // and refund policies need a home on the event's own site (DEC-001).
-      { label: "Registration", href: "/registration", inRelease: true },
+      { label: "Registration", href: ROUTES.registration, inRelease: true },
     ],
   },
   {
@@ -33,7 +34,7 @@ export const navigation: NavGroup[] = [
   },
   {
     label: "Results & Photos",
-    links: [{ label: "Results & Photos", href: "/results", inRelease: true }],
+    links: [{ label: "Results & Photos", href: ROUTES.results, inRelease: true }],
   },
   {
     label: "Get Involved",
@@ -49,7 +50,7 @@ export const navigation: NavGroup[] = [
   },
   {
     label: "Contact",
-    links: [{ label: "FAQs & Contact", href: "/faqs", inRelease: true }],
+    links: [{ label: "FAQs & Contact", href: ROUTES.faqs, inRelease: true }],
   },
 ];
 

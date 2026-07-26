@@ -45,9 +45,9 @@ Dropped by the product owner into `partners/`; map artifacts refiled under
 | Baptist Health (transparent) | `partners/Baptist Health logo - No Background.png` | 2048×706 PNG, alpha: yes | approved | Owner-supplied 2026-07-25 | `app/public/assets/partners/baptist-health.png` (880×303, trimmed) | Clean, sharp. Renders in the "Presented by" tier (DEC-006). |
 | Dole (transparent) | `partners/DOLE logo No background.png` | 2048×706 PNG, alpha: yes | approved (small display) | Owner-supplied 2026-07-25; sponsor confirmed | `app/public/assets/partners/dole.png` (480×321, trimmed) | Source appears AI-enlarged (slightly irregular sunburst). Invisible at the 2.75rem supporting-tier height. Request a brand original before any larger use. |
 | Fort Lauderdale Beach BID (attempt) | `partners/BID logo - No background.png` | 2048×706 PNG, alpha: yes | replace | Owner-supplied 2026-07-25 | none — withheld | AI-reconstructed enlargement: halo artifacts, text clipped mid-letter at the right edge ("Distric…", "….com"). Unfit to represent the partner's mark. URL is wired in content; publishes automatically once a clean file lands. |
-| Course KMZ (organizer GPS data) | `maps/2025-ly-fort-lauderdale-running-festival.kmz` | KML: 468-pt course line, start/finish, 4 turnarounds (incl. 5K), 10K split, relay exchange, 13 mile markers, 11 water stations | approved (source data) | Organizer file via owner 2026-07-25 | not rendered on site yet | Course line labeled "2024 NOVEMBER FINAL COURSE"; relay exchange "2025". 2026 geometry confirmation pending (DEC-012). Original filename: "2025 LY Fort LAUDERDALE Running Festival.kmz". |
+| Course KMZ (organizer GPS data) | `maps/2025-ly-fort-lauderdale-running-festival.kmz` | KML: 468-pt course line, start/finish, 4 turnarounds (incl. 5K), 10K split, relay exchange, 13 mile markers, 11 water stations | approved (source data) | Organizer file via owner 2026-07-25 | source for the full-course map used on all four distance pages | Course line labeled "2024 NOVEMBER FINAL COURSE"; relay exchange "2025". 2026 geometry confirmation pending (DEC-012). Original filename: "2025 LY Fort LAUDERDALE Running Festival.kmz". |
 | Course screenshot (legacy) | `maps/course-screenshot-2024.png` | 2048×706 PNG | reference | Organizer-derived via owner 2026-07-25 | none | Fuzzy Google-Earth capture; superseded by the KMZ-derived render below. Original filename: "Map of the race.png". |
-| Course map — full render | `maps/course-map-full.png` | 1988×4163 PNG | candidate | Rendered 2026-07-25 from the organizer KMZ (no generative processing); style approved by owner | not wired — course pages not built | CARTO Voyager basemap (attributed) + route, mile markers, water stations, turnarounds, relay exchange, 10K split, legend. Footnote marks "subject to 2026 confirmation". Per-distance variants pending DEC-012 confirmations. |
+| Course map — full render | `maps/course-map-full.png` | 1988×4163 PNG | candidate | Rendered 2026-07-25 from the organizer KMZ (no generative processing); style approved by owner | `app/public/assets/maps/course-map.avif` (1200 w, 262 KB) + `.webp` (289 KB); `course-map-large.avif` (1988 w, 657 KB) behind the "open full-size map" link | CARTO Voyager basemap (attributed) + route, mile markers, water stations, turnarounds, relay exchange, 10K split, legend. Footnote marks "subject to 2026 confirmation". **Live on all four distance pages** since 2026-07-25. Displayed at 640 px wide — capping its height to the viewport squeezed it to ~350 px and made every label unreadable. Per-distance variants pending DEC-012 confirmations. |
 
 ### Assets required but entirely absent
 
@@ -62,7 +62,7 @@ Nothing in the curated root satisfies these. All are blockers for a production r
 | Festival/finish-line photography | `agents.md` §6.8 | **generated placeholder in place** — real photography still required |
 | Volunteer/community photography | `plan.md` Phase 3 | **generated placeholder in place** (`race/community`) — real photography still required |
 | Course maps per distance | `agents.md` §7 | **organizer KMZ received 2026-07-25**; full-course render produced (see Owner-supplied files). Per-distance variants pending distance-logic + 2026 geometry confirmation (DEC-012). Maps must NOT be AI-generated. |
-| Interior hero photography (one per MVP route) | `agents.md` §7 | **generated placeholders staged** in `app/public/assets/heroes/interior-*.avif` — the interior routes do not exist yet, so nothing references them |
+| Interior hero photography (one per MVP route) | `agents.md` §7 | **generated placeholders live** on all nine interior routes; real photography still required |
 | Licensed brand fonts | `agents.md` §4 | missing |
 | Reversed (white) event lockup for dark surfaces — see DEC-010 | `agents.md` §6.2 | missing — must NOT be generated (brand asset) |
 
@@ -77,8 +77,9 @@ through the Bytedance 4k upscaler. Base prompts are the ones in
 `agents/media-brief.md`, extended per image with anti-text / anti-brand
 language ("plain solid-colour athletic wear, completely blank fabric… no
 bibs, no numbers, no logos, no signage"). Every file is wrapped in
-`GENERATED()` where referenced; `npm run audit` reports all 13 wired
-references and `build:production` blocks on them.
+`GENERATED()` where referenced; `npm run audit` reports 27 wired registrations
+across 21 generated still files, and `build:production` blocks on every use.
+Reuse of one file in multiple roles is intentionally reported more than once.
 
 Production copies are AVIF + WebP pairs under `app/public/assets/<category>/`.
 Curated masters are full-quality PNGs of the same crops under `assets/<category>/`.
@@ -131,4 +132,3 @@ Before copying an asset into the application:
 - Optimize format and dimensions.
 - Verify desktop and mobile crops.
 - Verify visual quality on light and dark backgrounds.
-

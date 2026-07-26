@@ -13,7 +13,7 @@
     "preview": "astro preview",
     "audit": "node scripts/content-audit.ts",
     "audit:release": "node scripts/content-audit.ts --release",
-    "test": "node --test tests/source-policy.test.ts",
+    "test": "node --test tests/source-policy.test.ts tests/config.test.ts",
     "test:build": "npm run build && node --test tests/build-output.test.ts",
     "qa": "npm run check && npm test && npm run test:build",
     "check": "astro check",

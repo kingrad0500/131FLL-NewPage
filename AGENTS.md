@@ -54,14 +54,18 @@ Priority when documents conflict: this file → current product-owner direction 
 
 - **Stack:** Astro + TypeScript (DEC-002). Application lives in [`app/`](app/).
 - **Release scope:** MVP (DEC-001) — Home, Race overview, distance pages, Schedule, Registration, Results & Photos, FAQs/Contact.
-- **Phase:** 6 complete (technical foundation). Homepage is built and static; advanced motion (Phase 9) not yet applied. Only `/` exists — the other MVP routes are unbuilt.
-- **Blocking gaps:** no photography, no video, no licensed fonts, unconfirmed event facts (DEC-009), unresolved sponsor tiering (DEC-006), no reversed lockup (DEC-010).
+- **Phase:** 8 complete; Phase 9 partial; automated production-readiness QA
+  implemented. All ten MVP routes exist. Manual cross-browser QA remains.
+- **Blocking gaps:** 22 unresolved facts, 27 generated-media registrations, two
+  hard artwork placeholders, one withheld sponsor, missing licensed fonts and
+  updated/reversed lockups, and pending course confirmations.
 
 ### Next task
 
-Generate interim media via Higgsfield against [`agents/media-brief.md`](agents/media-brief.md) — 19 assets. **Do the hero poster first and get it approved before generating the other 18**; agreeing art direction on one asset is far cheaper than redoing a set that is subtly off-palette.
-
-Every generated asset must be wrapped in `GENERATED()` from `app/src/lib/placeholder.ts` so it stays release-blocking (DEC-011).
+Resolve the owner-dependent blockers in
+[`agents/production-readiness.md`](agents/production-readiness.md). Replace
+generated media and hard placeholders only with approved assets. Run
+`npm run qa` for preview QA and `npm run build:production` for the release gate.
 
 ### Media tooling
 

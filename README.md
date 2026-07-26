@@ -48,22 +48,41 @@ Run from `app/`.
 | `npm run audit` | Content report (advisory) |
 | `npm run audit:release` | Content report that exits non-zero if anything is unresolved |
 | `npm run check` | Astro and TypeScript diagnostics |
+| `npm test` | Release-policy regression tests |
+| `npm run test:build` | Build and validate every generated route |
+| `npm run qa` | Diagnostics, policy tests, preview build, and output tests |
 
 ## Content model
 
 Content is structured data, not markup. Editing copy, distances, sponsors, or event facts means editing files in `app/src/content/` — no component changes required.
 
-- `event.ts` — canonical event facts (date, location, distances, URLs)
-- `distances.ts` — race distances for the distance rail and detail pages
+- `event.ts` — canonical event facts (date, location, URLs, contacts, social)
+- `distances.ts` — the four distances: times, pricing, registration links
+- `races.ts` — distance detail pages; a new distance is a data object here
+- `schedule.ts` — race-day timeline, packet pickup, packet contents, timing
+- `registration.ts` — registration policies, deadlines, and page hero
+- `results.ts` — results archive by year and distance
+- `faqs.ts` — FAQ groups and questions
+- `home.ts` — homepage hero, gallery cells, editorial, festival
 - `stories.ts` — story scroller steps
 - `sponsors.ts` — sponsors by tier
 - `navigation.ts` — menu structure
 
 ## Placeholder policy
 
-Unconfirmed values use the `TBD` helper from `src/lib/placeholder.ts`. These render with a visible badge in development and preview, and **fail `npm run build`**.
+Three markers in `src/lib/placeholder.ts` track content that is not ready:
 
-This is deliberate: it makes unfinished content impossible to ship by accident. See DEC-008 in [`agents/decisions.md`](agents/decisions.md).
+| Marker | Meaning | Renders as |
+|---|---|---|
+| `TBD()` | The value is unknown | A visible badge |
+| `UNCONFIRMED()` | Real, but not confirmed by the product owner | Normally |
+| `GENERATED()` | AI placeholder standing in for real media | Normally |
+
+All three are release-blocking. Provisional markers must be declared in
+`src/content/`; the source-policy test rejects markers placed directly in pages
+or components. Guaranteed visible placeholders use `releaseBlocking` and enter
+the same gate. See DEC-008, DEC-011, and DEC-015 in
+[`agents/decisions.md`](agents/decisions.md).
 
 To see what is currently unresolved:
 
@@ -73,10 +92,33 @@ npm run audit
 
 ## Current status
 
-Phase 6 — technical foundation. The static semantic homepage and shared shell are in place; advanced motion (Phase 9) is not yet applied.
+**Phase 8 complete** — the homepage and all nine MVP interior routes are built,
+and every navigation destination resolves. Parts of Phase 9 (motion polish) are
+already in: the homepage gallery hero and the sticky story sequence.
 
-Release scope is MVP (DEC-001). Production release is blocked on photography, video, licensed fonts, confirmed event facts (DEC-009), and sponsor tiering (DEC-006).
+Release scope is MVP (DEC-001). Production release remains blocked on real
+photography (27 generated registrations), 22 unresolved facts, two hard artwork
+placeholders, licensed fonts, and the brand assets listed in the manifest.
+
+A full record of what is built, what is confirmed, and what is outstanding is in
+[`agents/status.md`](agents/status.md).
+
+The latest verification evidence is in
+[`agents/production-readiness.md`](agents/production-readiness.md).
 
 ## Deployment
 
 Not yet configured. No production deployment may occur before the launch approval gate in [`agents/plan.md`](agents/plan.md) is satisfied.
+
+Preview builds default to `noindex, nofollow`, a site-wide `robots.txt`
+disallow, and an empty sitemap. For the final approved Vercel Production
+environment, set:
+
+```text
+PUBLIC_ALLOW_INDEXING=true
+PUBLIC_SITE_URL=https://the-final-production-domain.example
+```
+
+`npm run build:production` rejects a launch unless indexing is explicitly
+enabled and `PUBLIC_SITE_URL` is a valid HTTPS origin. Do not set these values
+for Preview environments.

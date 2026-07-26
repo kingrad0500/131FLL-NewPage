@@ -10,6 +10,10 @@ import EventTicker from "../components/EventTicker.astro";
 import SiteHeader from "../components/SiteHeader.astro";
 import ConversionFooter from "../components/ConversionFooter.astro";
 import FloatingContactButton from "../components/FloatingContactButton.astro";
+import {
+  canonicalUrl as buildCanonicalUrl,
+  readLaunchConfig,
+} from "../config/launch.ts";
 import "../styles/global.css";
 
 interface Props {
@@ -31,11 +35,8 @@ const {
  * Preview deployments fail closed for search indexing. The public launch must
  * explicitly set both variables in the production environment.
  */
-const allowIndexing = import.meta.env.PUBLIC_ALLOW_INDEXING === "true";
-const configuredSiteUrl = import.meta.env.PUBLIC_SITE_URL;
-const canonicalUrl = configuredSiteUrl
-  ? new URL(Astro.url.pathname, configuredSiteUrl).href
-  : undefined;
+const launch = readLaunchConfig(import.meta.env);
+const canonicalUrl = buildCanonicalUrl(Astro.url.pathname, launch);
 ---
 
 <!doctype html>
@@ -47,7 +48,7 @@ const canonicalUrl = configuredSiteUrl
     <meta name="description" content={description} />
     <meta
       name="robots"
-      content={allowIndexing ? "index, follow" : "noindex, nofollow"}
+      content={launch.allowIndexing ? "index, follow" : "noindex, nofollow"}
     />
     {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
     <meta name="generator" content={Astro.generator} />

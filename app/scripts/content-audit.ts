@@ -18,26 +18,15 @@ import { fileURLToPath } from "node:url";
 import { summarizeProvisional, findTBDPaths } from "../src/lib/placeholder.ts";
 import { withheldSponsors } from "../src/content/sponsors.ts";
 import { inspectSourcePolicy } from "./source-policy.ts";
+import {
+  readLaunchConfig,
+  validateProductionLaunch,
+} from "../src/config/launch.ts";
 
 const isRelease = process.argv.includes("--release");
-const allowIndexing = process.env.PUBLIC_ALLOW_INDEXING === "true";
-const siteUrl = process.env.PUBLIC_SITE_URL;
-const launchConfiguration: string[] = [];
-
-if (isRelease) {
-  if (!allowIndexing) {
-    launchConfiguration.push(
-      "PUBLIC_ALLOW_INDEXING must be exactly true for a production release.",
-    );
-  }
-  try {
-    if (!siteUrl || new URL(siteUrl).protocol !== "https:") throw new Error();
-  } catch {
-    launchConfiguration.push(
-      "PUBLIC_SITE_URL must be a valid HTTPS production origin.",
-    );
-  }
-}
+const launchConfiguration = isRelease
+  ? validateProductionLaunch(readLaunchConfig(process.env))
+  : [];
 
 /*
  * Content modules are discovered rather than listed. The provisional registry

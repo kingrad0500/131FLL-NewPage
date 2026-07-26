@@ -1,29 +1,17 @@
 import type { APIRoute } from "astro";
+import { readLaunchConfig } from "../config/launch.ts";
+import { MVP_ROUTES } from "../config/routes.ts";
 
 export const prerender = true;
 
-const routes = [
-  "/",
-  "/race",
-  "/race/schedule",
-  "/race/13-1",
-  "/race/relay",
-  "/race/10k",
-  "/race/5k",
-  "/registration",
-  "/results",
-  "/faqs",
-];
-
 export const GET: APIRoute = () => {
-  const allowIndexing = import.meta.env.PUBLIC_ALLOW_INDEXING === "true";
-  const siteUrl = import.meta.env.PUBLIC_SITE_URL;
+  const launch = readLaunchConfig(import.meta.env);
   const urls =
-    allowIndexing && siteUrl
-      ? routes
+    launch.allowIndexing && launch.siteUrl
+      ? MVP_ROUTES
           .map(
             (route) =>
-              `  <url><loc>${new URL(route, siteUrl).href}</loc></url>`,
+              `  <url><loc>${new URL(route, launch.siteUrl).href}</loc></url>`,
           )
           .join("\n")
       : "";

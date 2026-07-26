@@ -7,9 +7,9 @@
  * is omitted entirely rather than shown degraded — see the withheld list in
  * agents/asset-manifest.md and DEC-006.
  *
- * Tiers confirmed by the product owner 2026-07-25 (DEC-006): Baptist Health
- * "Presented by" first and largest, Liquid Youth as Title Partner, then
- * supporting partners.
+ * Tiers revised by the product owner 2026-07-26: Liquid Youth and Baptist
+ * Health share one top row labelled "Title Sponsor & Official Medical
+ * Provider", then supporting partners.
  *
  * The supporting marquee is deferred to Phase 9; a static grid is the
  * baseline and also the permanent reduced-motion presentation.
@@ -108,6 +108,16 @@ const titleId = `${id}-title`;
     flex-wrap: wrap;
     align-items: center;
     gap: var(--space-6) var(--space-8);
+  }
+
+  /*
+   * The lead tier holds two co-equal partners on one row, so it gets a wider
+   * gutter than the supporting grid — enough that the marks read as two
+   * separate logos rather than one lockup, and still wrap cleanly on narrow
+   * viewports.
+   */
+  .tier__logos--lg {
+    gap: var(--space-6) var(--space-10);
   }
 
   /*

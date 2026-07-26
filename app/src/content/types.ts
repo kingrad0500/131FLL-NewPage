@@ -87,7 +87,7 @@ export interface Distance {
   active: boolean;
 }
 
-export type SponsorTier = "presenting" | "title" | "supporting";
+export type SponsorTier = "lead" | "supporting";
 
 export interface Sponsor {
   name: string;

@@ -1,15 +1,16 @@
 import type { APIRoute } from "astro";
+import { canonicalUrl, readLaunchConfig } from "../config/launch.ts";
 
 export const prerender = true;
 
 export const GET: APIRoute = () => {
-  const allowIndexing = import.meta.env.PUBLIC_ALLOW_INDEXING === "true";
-  const siteUrl = import.meta.env.PUBLIC_SITE_URL;
-  const lines = allowIndexing
+  const launch = readLaunchConfig(import.meta.env);
+  const sitemapUrl = canonicalUrl("/sitemap.xml", launch);
+  const lines = launch.allowIndexing
     ? [
         "User-agent: *",
         "Allow: /",
-        ...(siteUrl ? [`Sitemap: ${new URL("/sitemap.xml", siteUrl).href}`] : []),
+        ...(sitemapUrl ? [`Sitemap: ${sitemapUrl}`] : []),
       ]
     : ["User-agent: *", "Disallow: /"];
 
